@@ -1,0 +1,5 @@
+2026-10-11 10:15:22,104 [INFO] InventoryApp: Application initialized successfully.
+2026-10-11 10:20:05,450 [ERROR] Module:Validation Line:42 - [Validation] Invalid SKU format. Must match pattern 'SKU-XXXX'.
+2026-10-11 10:22:18,891 [ERROR] Module:Validation Line:48 - [Validation] Quantity cannot be negative (Poka-Yoke lower limit violation).
+2026-10-11 10:25:40,210 [ERROR] Module:InventoryLogic Line:85 - UNIQUE constraint failed: items.sku (SKU: SKU-1001)
+2026-10-11 10:30:12,654 [ERROR] Module:StockControl Line:115 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
