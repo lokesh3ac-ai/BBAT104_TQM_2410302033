@@ -51,6 +51,7 @@ def validate_item_data(sku: str, name: str, category: str, quantity: str, unit_p
 
 def add_item(sku, name, category, quantity, unit_price, reorder_level="5"):
     """Adds a new inventory item with strict exception handling and logging."""
+    conn = None
     try:
         v_sku, v_name, v_cat, v_qty, v_price, v_reorder = validate_item_data(
             sku, name, category, quantity, unit_price, reorder_level
@@ -65,10 +66,8 @@ def add_item(sku, name, category, quantity, unit_price, reorder_level="5"):
             (v_sku, v_name, v_cat, v_qty, v_price, v_reorder),
         )
         conn.commit()
-        conn.close()
         return True, "Item added successfully."
     except ValueError as ve:
-        # Poka-Yoke validation failure (Log as warning/defect)
         log_system_error("Validation", str(ve))
         log_bug_to_db("ValidationModule", "ValidationFailure", 2, f"Failed entry for SKU '{sku}': {ve}")
         return False, str(ve)
@@ -84,6 +83,9 @@ def add_item(sku, name, category, quantity, unit_price, reorder_level="5"):
         log_system_error("InventoryLogic", error_msg)
         log_bug_to_db("InventoryCRUD", defect_type, 4, f"SKU: {sku} | Error: {error_msg}")
         return False, msg
+    finally:
+        if conn:
+            conn.close()
 
 
 def get_all_items():
@@ -117,6 +119,7 @@ def delete_item(item_id: int):
 
 def update_stock(sku: str, delta: int):
     """Adjusts stock levels (Stock In / Stock Out)."""
+    conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -132,7 +135,6 @@ def update_stock(sku: str, delta: int):
 
         cursor.execute("UPDATE items SET quantity = ? WHERE sku = ?", (new_qty, sku))
         conn.commit()
-        conn.close()
         return True, f"Stock updated. New Quantity: {new_qty}"
     except ValueError as ve:
         log_system_error("StockControl", str(ve))
@@ -142,4 +144,6 @@ def update_stock(sku: str, delta: int):
         log_system_error("StockControl", f"Update error: {e}")
         log_bug_to_db("StockModule", "UpdateFailure", 4, str(e))
         return False, str(e)
-    
+    finally:
+        if conn:
+            conn.close()
