@@ -2,4 +2,12 @@
 2026-10-11 10:20:05,450 [ERROR] Module:Validation Line:42 - [Validation] Invalid SKU format. Must match pattern 'SKU-XXXX'.
 2026-10-11 10:22:18,891 [ERROR] Module:Validation Line:48 - [Validation] Quantity cannot be negative (Poka-Yoke lower limit violation).
 2026-10-11 10:25:40,210 [ERROR] Module:InventoryLogic Line:85 - UNIQUE constraint failed: items.sku (SKU: SKU-1001)
-2026-10-11 10:30:12,654 [ERROR] Module:StockControl Line:115 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-11 10:30:12,654 [ERROR] Module:StockControl Line:115 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 102026-10-11 17:57:09,725 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-11 17:57:15,283 [ERROR] Module:InventoryApp Line:19 - [BugTracker] Failed to log bug in DB: database is locked
+2026-10-11 17:59:21,423 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-11 17:59:26,994 [ERROR] Module:InventoryApp Line:19 - [BugTracker] Failed to log bug in DB: database is locked
+2026-10-11 18:01:35,705 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-11 18:01:41,256 [ERROR] Module:InventoryApp Line:19 - [BugTracker] Failed to log bug in DB: database is locked
+2026-10-11 18:11:02,122 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-11 18:11:07,669 [ERROR] Module:InventoryApp Line:19 - [BugTracker] Failed to log bug in DB: database is locked
+2026-10-11 18:11:07,695 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
