@@ -7,9 +7,9 @@ __pycache__/
 *.db
 *.sqlite3
 
-# Logs
-logs/*.log
+# Logs (Ignore other logs, but keep system_errors.log for TQM evaluation)
 *.log
+!logs/system_errors.log
 !logs/.gitkeep
 
 # Virtual Environments
@@ -24,4 +24,3 @@ env/
 # OS files
 .DS_Store
 Thumbs.db
-EOF
