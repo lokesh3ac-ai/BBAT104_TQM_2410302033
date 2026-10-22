@@ -1,176 +1,322 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
-from app.database import init_db
-from app.inventory_logic import add_item, get_all_items, delete_item, update_stock
-from app.bug_tracker import get_all_bugs, update_bug_status
+import sqlite3
+import re
+from app.inventory_logic import add_item, update_stock, delete_item
+from app.bug_tracker import get_all_bugs, log_bug_to_db
+from app.database import get_connection
 
+# Set Theme & Palette
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
-class InventoryQualityApp(ctk.CTk):
+PALETTE = {
+    "bg": "#0d1117",
+    "card": "#161b22",
+    "card_border": "#30363d",
+    "accent_cyan": "#00d2ff",
+    "accent_purple": "#8a2be2",
+    "success": "#2ea043",
+    "danger": "#da3633",
+    "text_main": "#f0f6fc",
+    "text_muted": "#8b949e"
+}
+
+class InventoryApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Inventory Management System [Q09: Reduce Bugs] - BBAT104")
-        self.geometry("1050x650")
+        self.title("AERO-FLOW // TQM Q09 Defect-Proof Inventory")
+        self.geometry("1180x760")
+        self.minsize(1050, 680)
+        self.configure(fg_color=PALETTE["bg"])
 
-        init_db()
+        self.setup_layout()
+        self.refresh_all_data()
 
-        # Tabs Layout
-        self.tabview = ctk.CTkTabview(self, width=1000, height=600)
-        self.tabview.pack(padx=20, pady=20, fill="both", expand=True)
+    def setup_layout(self):
+        # 1. Header Banner
+        header = ctk.CTkFrame(self, fg_color=PALETTE["card"], corner_radius=12, border_width=1, border_color=PALETTE["card_border"])
+        header.pack(fill="x", padx=20, pady=(15, 10))
 
-        self.tab_inventory = self.tabview.add("📦 Inventory Master")
-        self.tab_bugs = self.tabview.add("🐛 In-App Bug Tracker (Q09)")
-
-        self.setup_inventory_tab()
-        self.setup_bug_tracker_tab()
-
-    # ================= INVENTORY TAB =================
-    def setup_inventory_tab(self):
-        # Left Panel (Input Form)
-        form_frame = ctk.CTkFrame(self.tab_inventory, width=320)
-        form_frame.pack(side="left", fill="y", padx=10, pady=10)
-
-        ctk.CTkLabel(form_frame, text="Add / Modify Item", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=10)
-
-        self.sku_entry = ctk.CTkEntry(form_frame, placeholder_text="SKU (e.g. SKU-101)")
-        self.sku_entry.pack(fill="x", padx=10, pady=5)
-
-        self.name_entry = ctk.CTkEntry(form_frame, placeholder_text="Item Name")
-        self.name_entry.pack(fill="x", padx=10, pady=5)
-
-        self.cat_entry = ctk.CTkEntry(form_frame, placeholder_text="Category (e.g. Electronics)")
-        self.cat_entry.pack(fill="x", padx=10, pady=5)
-
-        self.qty_entry = ctk.CTkEntry(form_frame, placeholder_text="Initial Quantity")
-        self.qty_entry.pack(fill="x", padx=10, pady=5)
-
-        self.price_entry = ctk.CTkEntry(form_frame, placeholder_text="Unit Price (₹)")
-        self.price_entry.pack(fill="x", padx=10, pady=5)
-
-        btn_add = ctk.CTkButton(form_frame, text="Add Item (Poka-Yoke)", command=self.handle_add_item)
-        btn_add.pack(fill="x", padx=10, pady=12)
-
-        ctk.CTkLabel(form_frame, text="Quick Stock Adjustment", font=ctk.CTkFont(size=14, weight="bold")).pack(pady=(15, 5))
-        self.stock_delta_entry = ctk.CTkEntry(form_frame, placeholder_text="Quantity (+/-)")
-        self.stock_delta_entry.pack(fill="x", padx=10, pady=5)
-
-        btn_adjust = ctk.CTkButton(form_frame, text="Update Stock", fg_color="green", command=self.handle_adjust_stock)
-        btn_adjust.pack(fill="x", padx=10, pady=5)
-
-        btn_delete = ctk.CTkButton(form_frame, text="Delete Selected", fg_color="crimson", command=self.handle_delete_item)
-        btn_delete.pack(fill="x", padx=10, pady=10)
-
-        # Right Panel (Table View)
-        table_frame = ctk.CTkFrame(self.tab_inventory)
-        table_frame.pack(side="right", fill="both", expand=True, padx=10, pady=10)
-
-        cols = ("ID", "SKU", "Name", "Category", "Qty", "Price", "Reorder")
-        self.tree = ttk.Treeview(table_frame, columns=cols, show="headings", height=18)
-        for col in cols:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, width=90, anchor="center")
-
-        self.tree.pack(fill="both", expand=True, padx=5, pady=5)
-        self.refresh_inventory_table()
-
-    def handle_add_item(self):
-        success, msg = add_item(
-            self.sku_entry.get(),
-            self.name_entry.get(),
-            self.cat_entry.get(),
-            self.qty_entry.get(),
-            self.price_entry.get()
+        title_label = ctk.CTkLabel(
+            header,
+            text="✦ AERO // INVENTORY & QUALITY CONTROLLER",
+            font=ctk.CTkFont(family="Inter", size=18, weight="bold"),
+            text_color=PALETTE["accent_cyan"]
         )
+        title_label.pack(side="left", padx=20, pady=12)
+
+        meta_badge = ctk.CTkLabel(
+            header,
+            text="TQM GOAL: Q09 (ZERO-DEFECT RUNTIME)",
+            font=ctk.CTkFont(family="Inter", size=11, weight="bold"),
+            fg_color="#1f242c",
+            text_color="#58a6ff",
+            corner_radius=8,
+            padx=12,
+            pady=4
+        )
+        meta_badge.pack(side="right", padx=20, pady=12)
+
+        # 2. KPI / Live Metrics Cards
+        kpi_frame = ctk.CTkFrame(self, fg_color="transparent")
+        kpi_frame.pack(fill="x", padx=20, pady=(0, 10))
+
+        self.card_total = self.create_kpi_card(kpi_frame, "TOTAL ITEMS", "0", PALETTE["accent_cyan"])
+        self.card_stock = self.create_kpi_card(kpi_frame, "ACTIVE STOCK", "0", PALETTE["accent_purple"])
+        self.card_low = self.create_kpi_card(kpi_frame, "LOW STOCK ALERTS", "0", "#e3b341")
+        self.card_defects = self.create_kpi_card(kpi_frame, "TRAPPED BUGS", "0", PALETTE["danger"])
+
+        # 3. Main Body Tabview
+        self.tabs = ctk.CTkTabview(
+            self,
+            fg_color=PALETTE["card"],
+            segmented_button_fg_color="#0d1117",
+            segmented_button_selected_color=PALETTE["accent_cyan"],
+            segmented_button_selected_hover_color="#00a8cc",
+            corner_radius=14,
+            border_width=1,
+            border_color=PALETTE["card_border"]
+        )
+        self.tabs.pack(fill="both", expand=True, padx=20, pady=(0, 15))
+
+        self.tab_inventory = self.tabs.add("  📦 Inventory Dashboard  ")
+        self.tab_tracker = self.tabs.add("  🛡️ Quality Bug Tracker (Q09)  ")
+
+        self.build_inventory_tab()
+        self.build_tracker_tab()
+
+    def create_kpi_card(self, parent, title, value, highlight_color):
+        card = ctk.CTkFrame(parent, fg_color=PALETTE["card"], corner_radius=12, border_width=1, border_color=PALETTE["card_border"])
+        card.pack(side="left", fill="both", expand=True, padx=5)
+
+        lbl_title = ctk.CTkLabel(card, text=title, font=ctk.CTkFont(family="Inter", size=10, weight="bold"), text_color=PALETTE["text_muted"])
+        lbl_title.pack(anchor="w", padx=14, pady=(10, 0))
+
+        lbl_value = ctk.CTkLabel(card, text=value, font=ctk.CTkFont(family="Inter", size=22, weight="bold"), text_color=highlight_color)
+        lbl_value.pack(anchor="w", padx=14, pady=(0, 10))
+        return lbl_value
+
+    def build_inventory_tab(self):
+        grid = ctk.CTkFrame(self.tab_inventory, fg_color="transparent")
+        grid.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Left Panel (Poka-Yoke Inputs)
+        left = ctk.CTkFrame(grid, fg_color="#12161f", width=280, corner_radius=12, border_width=1, border_color=PALETTE["card_border"])
+        left.pack(side="left", fill="y", padx=(0, 10), pady=0)
+        left.pack_propagate(False)
+
+        ctk.CTkLabel(left, text="Quick Entry (Poka-Yoke)", font=ctk.CTkFont(family="Inter", size=13, weight="bold"), text_color=PALETTE["text_main"]).pack(pady=(12, 10), padx=12, anchor="w")
+
+        self.ent_sku = self.create_styled_entry(left, "SKU (e.g. SKU-101)")
+        self.ent_name = self.create_styled_entry(left, "Item Name")
+        self.ent_category = self.create_styled_entry(left, "Category")
+        self.ent_qty = self.create_styled_entry(left, "Initial Quantity")
+        self.ent_price = self.create_styled_entry(left, "Unit Price (₹)")
+
+        btn_add = ctk.CTkButton(
+            left,
+            text="+ Add Verified Item",
+            fg_color="#1f6feb",
+            hover_color="#388bfd",
+            font=ctk.CTkFont(family="Inter", size=12, weight="bold"),
+            height=34,
+            corner_radius=8,
+            command=self.handle_add_item
+        )
+        btn_add.pack(fill="x", padx=12, pady=(10, 15))
+
+        # Divider
+        ctk.CTkFrame(left, fg_color=PALETTE["card_border"], height=1).pack(fill="x", padx=12, pady=5)
+
+        ctk.CTkLabel(left, text="Stock Adjustment", font=ctk.CTkFont(family="Inter", size=13, weight="bold"), text_color=PALETTE["text_main"]).pack(pady=(10, 6), padx=12, anchor="w")
+        self.ent_delta = self.create_styled_entry(left, "Delta Qty (+/-)")
+
+        btn_update = ctk.CTkButton(
+            left,
+            text="Update Level",
+            fg_color=PALETTE["success"],
+            hover_color="#3fb950",
+            font=ctk.CTkFont(family="Inter", size=12, weight="bold"),
+            height=32,
+            corner_radius=8,
+            command=self.handle_stock_adjust
+        )
+        btn_update.pack(fill="x", padx=12, pady=(6, 6))
+
+        btn_del = ctk.CTkButton(
+            left,
+            text="Delete Item",
+            fg_color=PALETTE["danger"],
+            hover_color="#f85149",
+            font=ctk.CTkFont(family="Inter", size=12, weight="bold"),
+            height=32,
+            corner_radius=8,
+            command=self.handle_delete_item
+        )
+        btn_del.pack(fill="x", padx=12, pady=(0, 12))
+
+        # Right Panel: Modern Styled Table
+        right = ctk.CTkFrame(grid, fg_color="transparent")
+        right.pack(side="right", fill="both", expand=True)
+
+        cols = ("ID", "SKU", "Name", "Category", "Quantity", "Price", "Reorder")
+        self.inv_tree = self.create_modern_treeview(right, cols)
+
+    def build_tracker_tab(self):
+        frame = ctk.CTkFrame(self.tab_tracker, fg_color="transparent")
+        frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        header_box = ctk.CTkFrame(frame, fg_color="#12161f", corner_radius=10, border_width=1, border_color=PALETTE["card_border"])
+        header_box.pack(fill="x", pady=(0, 10))
+
+        ctk.CTkLabel(
+            header_box,
+            text="Real-time Defect Detection & Root Cause Capture (Poka-Yoke & Exception Logs)",
+            font=ctk.CTkFont(family="Inter", size=12),
+            text_color=PALETTE["text_muted"]
+        ).pack(side="left", padx=15, pady=10)
+
+        btn_refresh = ctk.CTkButton(
+            header_box,
+            text="Sync Logs",
+            fg_color="#21262d",
+            hover_color="#30363d",
+            font=ctk.CTkFont(size=11),
+            width=90,
+            command=self.refresh_all_data
+        )
+        btn_refresh.pack(side="right", padx=12, pady=8)
+
+        cols = ("ID", "Timestamp", "Module", "Defect Type", "Severity", "Status", "Details")
+        self.bug_tree = self.create_modern_treeview(frame, cols)
+
+    def create_styled_entry(self, parent, placeholder):
+        ent = ctk.CTkEntry(
+            parent,
+            placeholder_text=placeholder,
+            height=32,
+            corner_radius=8,
+            border_width=1,
+            border_color=PALETTE["card_border"],
+            fg_color="#0d1117",
+            placeholder_text_color="#484f58",
+            font=ctk.CTkFont(family="Inter", size=12)
+        )
+        ent.pack(fill="x", padx=12, pady=4)
+        return ent
+
+    def create_modern_treeview(self, parent, columns):
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure(
+            "Treeview",
+            background="#0d1117",
+            foreground="#f0f6fc",
+            fieldbackground="#0d1117",
+            rowheight=32,
+            font=("Segoe UI", 10),
+            borderwidth=0
+        )
+        style.configure("Treeview.Heading", background="#161b22", foreground="#58a6ff", font=("Segoe UI", 10, "bold"), relief="flat")
+        style.map("Treeview", background=[("selected", "#1f6feb")])
+
+        tree = ttk.Treeview(parent, columns=columns, show="headings", selectmode="browse")
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, anchor="center", stretch=True, width=100)
+
+        scrollbar = ttk.Scrollbar(parent, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        tree.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        return tree
+
+    # 4. Logical Handlers
+    def handle_add_item(self):
+        sku = self.ent_sku.get()
+        name = self.ent_name.get()
+        cat = self.ent_category.get()
+        qty = self.ent_qty.get()
+        price = self.ent_price.get()
+
+        success, msg = add_item(sku, name, cat, qty, price)
         if success:
-            messagebox.showinfo("Success", msg)
-            self.sku_entry.delete(0, 'end')
-            self.name_entry.delete(0, 'end')
-            self.cat_entry.delete(0, 'end')
-            self.qty_entry.delete(0, 'end')
-            self.price_entry.delete(0, 'end')
-            self.refresh_inventory_table()
+            messagebox.showinfo("Quality Verified", msg)
+            self.ent_sku.delete(0, 'end')
+            self.ent_name.delete(0, 'end')
+            self.ent_category.delete(0, 'end')
+            self.ent_qty.delete(0, 'end')
+            self.ent_price.delete(0, 'end')
         else:
-            messagebox.showerror("Validation / DB Error", msg)
-            self.refresh_bugs_table()
+            messagebox.showerror("Poka-Yoke Trap", f"Entry Rejected:\n{msg}")
+        self.refresh_all_data()
 
-    def handle_adjust_stock(self):
-        selected = self.tree.selection()
+    def handle_stock_adjust(self):
+        selected = self.inv_tree.selection()
         if not selected:
-            messagebox.showwarning("Warning", "Select an item from the table first.")
+            messagebox.showwarning("Selection Missing", "Please select an item from table.")
             return
-        item_values = self.tree.item(selected[0], "values")
-        sku = item_values[1]
 
+        delta_val = self.ent_delta.get().strip()
         try:
-            delta = int(self.stock_delta_entry.get())
-            success, msg = update_stock(sku, delta)
-            if success:
-                messagebox.showinfo("Success", msg)
-                self.stock_delta_entry.delete(0, 'end')
-                self.refresh_inventory_table()
-            else:
-                messagebox.showerror("Error", msg)
-                self.refresh_bugs_table()
+            delta = int(delta_val)
         except ValueError:
-            messagebox.showerror("Error", "Delta must be an integer (e.g. +10 or -5).")
+            messagebox.showerror("Type Fault", "Enter valid integer for adjustment (+/-).")
+            return
+
+        sku = self.inv_tree.item(selected[0])["values"][1]
+        success, msg = update_stock(sku, delta)
+        if success:
+            messagebox.showinfo("Stock Updated", msg)
+            self.ent_delta.delete(0, 'end')
+        else:
+            messagebox.showerror("Constraint Violation", msg)
+        self.refresh_all_data()
 
     def handle_delete_item(self):
-        selected = self.tree.selection()
+        selected = self.inv_tree.selection()
         if not selected:
-            messagebox.showwarning("Warning", "Select an item to delete.")
+            messagebox.showwarning("Selection Missing", "Please select an item from table.")
             return
-        item_id = self.tree.item(selected[0], "values")[0]
-        success, msg = delete_item(item_id)
-        if success:
-            messagebox.showinfo("Deleted", msg)
-            self.refresh_inventory_table()
-        else:
-            messagebox.showerror("Error", msg)
 
-    def refresh_inventory_table(self):
-        for row in self.tree.get_children():
-            self.tree.delete(row)
-        for item in get_all_items():
-            self.tree.insert("", "end", values=item)
+        sku = self.inv_tree.item(selected[0])["values"][1]
+        if messagebox.askyesno("Confirm Delete", f"Delete record {sku}?"):
+            delete_item(sku)
+            self.refresh_all_data()
 
-    # ================= BUG TRACKER TAB (Q09) =================
-    def setup_bug_tracker_tab(self):
-        top_frame = ctk.CTkFrame(self.tab_bugs)
-        top_frame.pack(fill="x", padx=10, pady=10)
+    def refresh_all_data(self):
+        # Refresh Inventory Table
+        for r in self.inv_tree.get_children():
+            self.inv_tree.delete(r)
 
-        ctk.CTkLabel(top_frame, text="Logged System Defects & Exceptions", font=ctk.CTkFont(size=16, weight="bold")).pack(side="left", padx=10)
-        btn_refresh = ctk.CTkButton(top_frame, text="Refresh Logs", width=100, command=self.refresh_bugs_table)
-        btn_refresh.pack(side="right", padx=5)
+        conn = get_connection()
+        c = conn.cursor()
+        c.execute("SELECT id, sku, name, category, quantity, unit_price, reorder_level FROM items ORDER BY id DESC")
+        items = c.fetchall()
 
-        btn_resolve = ctk.CTkButton(top_frame, text="Mark Selected as Resolved", fg_color="green", command=self.handle_resolve_bug)
-        btn_resolve.pack(side="right", padx=5)
+        total_items = len(items)
+        total_qty = sum(item[4] for item in items)
+        low_stock_count = sum(1 for item in items if item[4] <= item[6])
 
-        bug_cols = ("Bug ID", "Module", "Type", "Severity", "Description", "Status", "Timestamp")
-        self.bug_tree = ttk.Treeview(self.tab_bugs, columns=bug_cols, show="headings", height=18)
-        for col in bug_cols:
-            self.bug_tree.heading(col, text=col)
-            self.bug_tree.column(col, width=120, anchor="center")
-        self.bug_tree.column("Description", width=260, anchor="w")
+        for item in items:
+            self.inv_tree.insert("", "end", values=item)
 
-        self.bug_tree.pack(fill="both", expand=True, padx=10, pady=10)
-        self.refresh_bugs_table()
+        # Refresh Bug Tracker Table
+        for r in self.bug_tree.get_children():
+            self.bug_tree.delete(r)
 
-    def handle_resolve_bug(self):
-        selected = self.bug_tree.selection()
-        if not selected:
-            messagebox.showwarning("Warning", "Select a defect log to resolve.")
-            return
-        bug_id = self.bug_tree.item(selected[0], "values")[0]
-        update_bug_status(bug_id, "Resolved")
-        self.refresh_bugs_table()
-
-    def refresh_bugs_table(self):
-        for row in self.bug_tree.get_children():
-            self.bug_tree.delete(row)
-        for bug in get_all_bugs():
+        bugs = get_all_bugs()
+        for bug in bugs:
             self.bug_tree.insert("", "end", values=bug)
+        conn.close()
+
+        # Update KPI Indicators
+        self.card_total.configure(text=str(total_items))
+        self.card_stock.configure(text=str(total_qty))
+        self.card_low.configure(text=str(low_stock_count))
+        self.card_defects.configure(text=str(len(bugs)))
 
 if __name__ == "__main__":
-    app = InventoryQualityApp()
+    app = InventoryApp()
     app.mainloop()
