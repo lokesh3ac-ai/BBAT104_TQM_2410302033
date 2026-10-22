@@ -286,18 +286,28 @@ class InventoryApp(ctk.CTk):
             self.refresh_all_data()
 
     def refresh_all_data(self):
-        # Refresh Inventory Table
+        # Clear existing inventory items
         for r in self.inv_tree.get_children():
             self.inv_tree.delete(r)
 
         conn = get_connection()
         c = conn.cursor()
-        c.execute("SELECT id, sku, name, category, quantity, unit_price, reorder_level FROM items ORDER BY id DESC")
+        
+        # Check table columns dynamically to support schemas with or without 'id'
+        c.execute("PRAGMA table_info(items)")
+        columns_info = [col[1] for col in c.fetchall()]
+        
+        if "id" in columns_info:
+            c.execute("SELECT id, sku, name, category, quantity, unit_price, reorder_level FROM items ORDER BY id DESC")
+        else:
+            # Use SQLite internal rowid as ID if explicit 'id' column is missing
+            c.execute("SELECT rowid, sku, name, category, quantity, unit_price, reorder_level FROM items ORDER BY rowid DESC")
+            
         items = c.fetchall()
 
         total_items = len(items)
-        total_qty = sum(item[4] for item in items)
-        low_stock_count = sum(1 for item in items if item[4] <= item[6])
+        total_qty = sum(item[4] for item in items) if items else 0
+        low_stock_count = sum(1 for item in items if item[4] <= item[6]) if items else 0
 
         for item in items:
             self.inv_tree.insert("", "end", values=item)
@@ -306,16 +316,21 @@ class InventoryApp(ctk.CTk):
         for r in self.bug_tree.get_children():
             self.bug_tree.delete(r)
 
-        bugs = get_all_bugs()
-        for bug in bugs:
-            self.bug_tree.insert("", "end", values=bug)
+        try:
+            bugs = get_all_bugs()
+            for bug in bugs:
+                self.bug_tree.insert("", "end", values=bug)
+            bug_count = len(bugs)
+        except Exception:
+            bug_count = 0
+            
         conn.close()
 
         # Update KPI Indicators
         self.card_total.configure(text=str(total_items))
         self.card_stock.configure(text=str(total_qty))
         self.card_low.configure(text=str(low_stock_count))
-        self.card_defects.configure(text=str(len(bugs)))
+        self.card_defects.configure(text=str(bug_count))
 
 if __name__ == "__main__":
     app = InventoryApp()
