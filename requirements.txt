@@ -2,3 +2,4 @@ customtkinter>=5.2.0
 matplotlib>=3.7.0
 pandas>=2.0.0
 seaborn>=0.12.0
+Flask>=3.0.0

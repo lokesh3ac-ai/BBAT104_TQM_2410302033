@@ -21,3 +21,10 @@
 2026-10-23 19:55:57,880 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
 2026-10-23 19:56:40,379 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
 2026-10-23 19:56:40,406 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-23 20:05:12,429 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-23 20:05:12,509 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-23 20:20:02,993 [ERROR] Module:InventoryApp Line:19 - [Validation] Quantity cannot be negative (Poka-Yoke lower limit violation).
+2026-10-23 20:20:08,846 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-23 20:20:08,870 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-23 20:21:04,196 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-23 20:21:04,222 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10

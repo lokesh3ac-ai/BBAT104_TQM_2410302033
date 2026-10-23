@@ -2,7 +2,7 @@
 ### Total Quality Management (BBAT104) Course Project
 
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![GUI Framework](https://img.shields.io/badge/GUI-CustomTkinter-darkblue.svg)](https://customtkinter.tomschimansky.com/)
+[![GUI Framework](https://img.shields.io/badge/GUI-CustomTkinter%20%2B%20NextGen%20Desktop-darkblue.svg)](https://customtkinter.tomschimansky.com/)
 [![Database](https://img.shields.io/badge/Database-SQLite3-brightgreen.svg)](https://www.sqlite.org/)
 [![Quality Goal](https://img.shields.io/badge/TQM%20Goal-Q09%3A%20Reduce%20Bugs-red.svg)](#)
 
@@ -19,6 +19,24 @@
 
 ---
 
+## 🌟 Dual-Mode Desktop Suite Architecture
+The system provides **two modern desktop interfaces**, sharing the unified SQLite engine and Poka-Yoke logic tier:
+
+### Mode 1: Next-Gen Web-Powered Desktop Suite (`Launch_NextGen_App.bat`)
+- Standalone borderless desktop window powered by Chromium app mode (`--app`).
+- Modern glassmorphic dark theme (`#070a13`), animated Chart.js Pareto & Category charts, live Lucide icons.
+- Instant search with keystroke filtering, real-time Poka-Yoke visual regex feedback, stock adjustment steppers (`-5`, `-1`, `+1`, `+5`).
+- Defect Tracker with 1-click lifecycle transitions (`Open` ➔ `In-Progress` ➔ `Resolved`).
+- Interactive FMEA Risk Scorecard (93.1% RPN reduction), Ishikawa Root-Cause Diagram, and PDCA cycles.
+- Live system audit console and one-click CSV export.
+
+### Mode 2: Native CustomTkinter Desktop Application (`Launch_CustomTkinter_App.bat`)
+- Pure Python desktop GUI utilizing CustomTkinter dark theme.
+- Persistent 260px navigation sidebar, 5 modular workspaces, and real-time treeview tables.
+- Satisfies formal university BBAT104 curriculum requirements.
+
+---
+
 ## 🎯 Target Features Implemented (Q09 Matrix)
 1. **Crash-Proof Exception Handling:** Robust `try-except-finally` blocks and SQLite connection timeouts (20s) preventing unhandled write locks and application crashes.
 2. **Poka-Yoke Strict Validation:** Regex pattern matching for SKU formats (`^SKU-[A-Z0-9]{3,8}$`), strictly positive unit prices (`price > 0`), and non-negative stock counts (`quantity >= 0`).
@@ -29,40 +47,25 @@
 
 ---
 
-## 🖥️ Modern & Aesthetic UI Features
-The desktop interface is built using CustomTkinter with a dark cyber slate aesthetic:
-- **Left Navigation Rail (Sidebar):** Quick switching between 5 dedicated workspaces:
-  - 📦 **Inventory Master:** Full stock visibility, real-time keystroke search, category filter, stock status pills (`✅ Healthy`, `⚠️ Low Stock`, `❌ Out of Stock`), column header sorting, and quick stock adjustment (`-5`, `-1`, `+1`, `+5`, custom delta).
-  - 🛡️ **Defect Tracker (Q09):** Defect interception logs, severity tags (`⚡ Sev 2`, `⚠️ Sev 3`, `🔥 Sev 4`), status filter, and 1-click lifecycle transitions.
-  - 📊 **TQM SQC Analytics:** Embedded high-resolution Pareto Chart, Ishikawa Fishbone Diagram, FMEA Risk Scorecard, and PDCA cycles.
-  - 🖥️ **Live System Logs:** Monospace terminal console rendering `logs/system_errors.log` with refresh, clear, and clipboard capabilities.
-  - ℹ️ **Knowledge Base & SOP:** Embedded documentation of Poka-Yoke rules, CTQ flowdown, and student credentials.
-- **Live KPI Ribbon:** Real-time metrics for Total SKUs, Warehouse Units, Asset Valuation (₹), Low Stock Alerts, and Trapped Defects.
-- **Interactive Modals:** Add Item modal featuring **Live Poka-Yoke Visual Feedback** (validating regex syntax and numeric bounds as the user types), and full Edit Item dialog.
-- **Export Engine:** One-click CSV inventory audit report generation.
-- **Examiner Demo Sandbox:** "⚡ Trigger Poka-Yoke Trap" button allowing instant demonstration of defect interception without crashes.
-
----
-
 ## 🏛️ System Architecture Flow
 ```
-+-----------------------------------------------------------+
-|               CustomTkinter Modern Dashboard              |
-|   (Sidebar Rail • Live KPIs • 5 Specialized Workspaces)    |
-+-----------------------------+-----------------------------+
-                              | User Inputs & Actions
-                              v
-+-----------------------------------------------------------+
-|               Poka-Yoke Validation Layer                  |
-|     (Regex SKU Pattern, Bounds Checking, Numeric Cast)    |
-+-----------------------------+-----------------------------+
-| Valid Data                  | Invalid Entry Trapped
-v                             v
-+-----------------------------+  +--------------------------+
-|       SQLite3 Engine        |  |   Bug Tracker & Audit    |
-| (items, bug_reports tables) |  |   - system_errors.log    |
-+-----------------------------+  |   - bug_reports table    |
-                                 +--------------------------+
++-------------------------------------------------------------------+
+|               AERO-FLOW DUAL-MODE DESKTOP SUITE                   |
+|   [ Mode 1: Next-Gen Desktop App ]  |  [ Mode 2: CustomTkinter ]  |
++-------------------------------------+-----------------------------+
+                                      | User Inputs & Actions
+                                      v
++-------------------------------------------------------------------+
+|                   Poka-Yoke Validation Layer                      |
+|       (Regex SKU Pattern, Bounds Checking, Numeric Cast)          |
++-------------------------------------+-----------------------------+
+| Valid Data Payload                  | Invalid Entry Trapped
+v                                     v
++-------------------------------------+  +--------------------------+
+|           SQLite3 Engine            |  |   Bug Tracker & Audit    |
+|     (items, bug_reports tables)     |  |   - system_errors.log    |
++-------------------------------------+  |   - bug_reports table    |
+                                         +--------------------------+
 ```
 
 ---
@@ -81,66 +84,71 @@ Identifies potential causes behind system defects across People, Process, Method
 
 ---
 
-## 🚀 Installation & Setup Instructions
+## 🚀 One-Click Launch Instructions
 
-### 1. Clone Repository
-```bash
-git clone https://github.com/lokesh3ac-ai/BBAT104_TQM_2410302033.git
-cd BBAT104_TQM_2410302033
-```
+### Method A: One-Click Desktop Launchers (Recommended)
+- **Launch Next-Gen Modern Desktop App:** Double-click `Launch_NextGen_App.bat`
+- **Launch CustomTkinter Native App:** Double-click `Launch_CustomTkinter_App.bat`
+- **Launch Silent (Windowless Background Server):** Double-click `Launch_Silent_NextGen_App.vbs`
 
-### 2. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Initialize SQLite Database
-```bash
-python -m app.database
-```
-
-### 4. Launch Desktop Application
-```bash
-python -m app.gui
-```
-
-### 5. Run Automated Test Suite
-```bash
-python -m unittest discover -s tests -p "test_*.py" -v
-```
-
-### 6. Regenerate SQC Charts
-```bash
-python -m tqm_tools.generate_pareto
-python -m tqm_tools.generate_fishbone
-```
+### Method B: Command Line Launch
+1. **Install Dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Launch Next-Gen Desktop Application:**
+   ```bash
+   python -m app.launcher
+   ```
+3. **Launch CustomTkinter Desktop Application:**
+   ```bash
+   python -m app.gui
+   ```
+4. **Run Automated Test Suite:**
+   ```bash
+   python -m unittest discover -s tests -p "test_*.py" -v
+   ```
+5. **Regenerate SQC Charts:**
+   ```bash
+   python -m tqm_tools.generate_pareto
+   python -m tqm_tools.generate_fishbone
+   ```
 
 ---
 
 ## 📁 Repository Directory Structure
 ```
 BBAT104_TQM_2410302033/
+├── Launch_NextGen_App.bat        # One-click Next-Gen desktop launcher
+├── Launch_CustomTkinter_App.bat  # One-click CustomTkinter launcher
+├── Launch_Silent_NextGen_App.vbs # Silent background desktop launcher
 ├── app/
-│   ├── __init__.py           # Package definition
-│   ├── database.py           # SQLite connection & schema initialization
-│   ├── inventory_logic.py    # CRUD operations, Poka-Yoke validations & stats
-│   ├── bug_tracker.py        # Defect logging, status workflow & DB reporting
-│   └── gui.py                # CustomTkinter aesthetic & modern UI dashboard
+│   ├── __init__.py               # Package definition
+│   ├── database.py               # SQLite connection & schema initialization
+│   ├── inventory_logic.py        # CRUD operations, Poka-Yoke validations & stats
+│   ├── bug_tracker.py            # Defect logging, status workflow & DB reporting
+│   ├── gui.py                    # CustomTkinter aesthetic & modern UI dashboard
+│   ├── launcher.py               # Standalone desktop window launcher
+│   └── desktop_web/              # Next-Gen modern application tier
+│       ├── server.py             # REST API & application server
+│       ├── templates/
+│       │   └── index.html        # Responsive glassmorphic SPA (Tailwind + Chart.js)
+│       └── static/
 ├── tests/
 │   ├── __init__.py
-│   └── test_inventory.py     # Automated unit test suite (6 passing tests)
+│   └── test_inventory.py         # Automated unit test suite (6 passing tests)
 ├── tqm_tools/
-│   ├── generate_pareto.py    # 80/20 Pareto analysis chart generator
-│   └── generate_fishbone.py  # Ishikawa root-cause diagram generator
+│   ├── generate_pareto.py        # 80/20 Pareto analysis chart generator
+│   └── generate_fishbone.py      # Ishikawa root-cause diagram generator
 ├── docs/
-│   ├── SRS_Document.md       # Software Requirements Specification (CO1)
-│   ├── FMEA_Matrix.md        # Risk audit, RPN scores & SIPOC map (CO2)
-│   ├── PDCA_Log.md           # Continuous improvement cycles (CO3)
-│   ├── pareto_analysis.png   # Generated SQC Pareto chart
-│   └── fishbone_diagram.png  # Generated Ishikawa diagram
+│   ├── SRS_Document.md           # Software Requirements Specification (CO1)
+│   ├── FMEA_Matrix.md            # Risk audit, RPN scores & SIPOC map (CO2)
+│   ├── PDCA_Log.md               # Continuous improvement cycles (CO3)
+│   ├── pareto_analysis.png       # Generated SQC Pareto chart
+│   └── fishbone_diagram.png      # Generated Ishikawa diagram
 ├── logs/
 │   ├── .gitkeep
-│   └── system_errors.log     # Runtime system error logs
-├── requirements.txt          # Python project dependencies
-└── README.md                 # Project documentation & user guide
+│   └── system_errors.log         # Runtime system error logs
+├── requirements.txt              # Python project dependencies
+└── README.md                     # Project documentation & user guide
 ```
