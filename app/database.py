@@ -4,8 +4,8 @@ import os
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "inventory_q09.db")
 
 def get_connection():
-    """Returns a SQLite connection with foreign keys enabled."""
-    conn = sqlite3.connect(DB_PATH)
+    """Returns a SQLite connection with foreign keys enabled and concurrency timeout."""
+    conn = sqlite3.connect(DB_PATH, timeout=20.0)
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 

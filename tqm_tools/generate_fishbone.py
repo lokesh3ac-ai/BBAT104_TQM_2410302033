@@ -2,55 +2,60 @@ import matplotlib.pyplot as plt
 import os
 
 def generate_fishbone_diagram():
-    fig, ax = plt.subplots(figsize=(12, 7))
+    plt.style.use("dark_background")
+    fig, ax = plt.subplots(figsize=(12, 6.8), facecolor="#0e1526")
+    ax.set_facecolor("#0e1526")
     ax.set_xlim(0, 10)
     ax.set_ylim(0, 10)
     ax.axis("off")
 
     # Main spine and defect head
-    ax.annotate("", xy=(8.5, 5), xytext=(1.0, 5),
-                arrowprops=dict(arrowstyle="->", lw=3.5, color="#1a252f"))
-    ax.text(8.7, 5, "Problem Statement:\nSoftware Runtime\nBugs & Crashes\n(Q09 Focus)",
-            va="center", ha="left", fontsize=11, weight="bold",
-            bbox=dict(boxstyle="square,pad=0.5", facecolor="#fadbd8", edgecolor="#e74c3c", lw=2))
+    ax.annotate("", xy=(8.3, 5), xytext=(0.8, 5),
+                arrowprops=dict(arrowstyle="->", lw=3.5, color="#38bdf8"))
+    
+    # Problem Head Box
+    ax.text(8.4, 5, "PROBLEM STATEMENT:\nSoftware Runtime\nDefects & Crashes\n(Q09 Target Goal)",
+            va="center", ha="left", fontsize=10, weight="bold", color="#ffffff",
+            bbox=dict(boxstyle="square,pad=0.6", facecolor="#881337", edgecolor="#f43f5e", lw=2))
 
-    # Major bone branches
+    # Major bone branches (4M/4P Categories)
     categories = [
-        ("People (Staff)", 3.0, 5, 2.0, 8.5),
-        ("Process / Testing", 6.0, 5, 5.0, 8.5),
-        ("Methods / Validation", 3.0, 5, 4.0, 1.5),
-        ("Technology / DB", 6.0, 5, 7.0, 1.5)
+        ("People (Staff / Users)", 2.8, 5, 1.8, 8.4),
+        ("Process & Testing", 5.8, 5, 4.8, 8.4),
+        ("Methods (Validation)", 2.8, 5, 3.8, 1.6),
+        ("Technology (SQLite / OS)", 5.8, 5, 6.8, 1.6)
     ]
 
     for label, x_start, y_start, x_end, y_end in categories:
         ax.annotate("", xy=(x_start, y_start), xytext=(x_end, y_end),
-                    arrowprops=dict(arrowstyle="-", lw=2.2, color="#2c3e50"))
-        ax.text(x_end, y_end + (0.3 if y_end > 5 else -0.5), label,
-                ha="center", fontsize=11, weight="bold",
-                bbox=dict(boxstyle="round,pad=0.3", facecolor="#ebf5fb", edgecolor="#2980b9"))
+                    arrowprops=dict(arrowstyle="-", lw=2.2, color="#60a5fa"))
+        ax.text(x_end, y_end + (0.35 if y_end > 5 else -0.55), label,
+                ha="center", fontsize=10, weight="bold", color="#ffffff",
+                bbox=dict(boxstyle="round,pad=0.35", facecolor="#1e293b", edgecolor="#38bdf8", lw=1.5))
 
     # Root causes
     causes = [
-        ("Typo in SKU input", 2.3, 7.5),
-        ("Untrained clerk", 2.7, 6.5),
-        ("No unit test coverage", 5.3, 7.5),
-        ("Untracked exception stack", 5.7, 6.5),
-        ("Missing Poka-Yoke guards", 3.7, 2.5),
-        ("No lower-bound verification", 3.3, 3.5),
-        ("Unchecked SQLite unique keys", 6.7, 2.5),
-        ("Silent unhandled errors", 6.3, 3.5)
+        ("• Typo in SKU formatting", 2.0, 7.4),
+        ("• Untrained clerk data entry", 2.3, 6.5),
+        ("• Missing regression unit test suite", 5.0, 7.4),
+        ("• Untracked exception stack traces", 5.3, 6.5),
+        ("• Absence of Poka-Yoke input guards", 3.4, 2.7),
+        ("• Negative quantity underflow ignored", 3.1, 3.6),
+        ("• Uncaught SQLite UNIQUE key clashes", 6.3, 2.7),
+        ("• Silent unhandled runtime exceptions", 6.0, 3.6)
     ]
 
     for cause, x, y in causes:
-        ax.text(x, y, f"• {cause}", fontsize=9, color="#34495e")
+        ax.text(x, y, cause, fontsize=9, color="#cbd5e1", weight="medium")
 
-    plt.title("Ishikawa (Fishbone) Root Cause Diagram - Quality Goal Q09", fontsize=14, weight="bold", pad=20)
+    plt.title("Ishikawa (Fishbone) Root Cause Diagram - Quality Goal Q09 Defect Prevention", 
+              fontsize=13, weight="bold", pad=20, color="#38bdf8")
     fig.tight_layout()
 
     output_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs")
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "fishbone_diagram.png")
-    plt.savefig(output_path, dpi=300)
+    plt.savefig(output_path, dpi=200, bbox_inches="tight")
     plt.close()
     print(f"[SQC] Fishbone diagram saved successfully to: {output_path}")
 

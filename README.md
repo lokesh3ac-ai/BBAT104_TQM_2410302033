@@ -20,33 +20,50 @@
 ---
 
 ## 🎯 Target Features Implemented (Q09 Matrix)
-1. **Exception Handling:** Robust `try-except-finally` blocks preventing unexpected software crashes and unhandled SQLite database write locks.
-2. **Strict Validation (Poka-Yoke):** Regex pattern matching for SKU formats (`SKU-XXXX`), boundary enforcement for positive unit prices, and non-negative stock counts.
-3. **Module Tests:** Automated `unittest` test suite verifying Poka-Yoke boundaries, lower limits, and duplicate entry prevention.
-4. **In-App Bug Tracker:** Dedicated dashboard tab to log defect type, severity rating (1–5), module origin, and resolution status (`Open` / `Resolved`).
-5. **Error Logs:** Real-time logging engine writing formatted timestamps, module traces, and error levels to `logs/system_errors.log`.
+1. **Crash-Proof Exception Handling:** Robust `try-except-finally` blocks and SQLite connection timeouts (20s) preventing unhandled write locks and application crashes.
+2. **Poka-Yoke Strict Validation:** Regex pattern matching for SKU formats (`^SKU-[A-Z0-9]{3,8}$`), strictly positive unit prices (`price > 0`), and non-negative stock counts (`quantity >= 0`).
+3. **Automated Unit Tests:** Standalone `unittest` suite verifying boundary constraints, lower limits, and duplicate entry prevention.
+4. **In-App Bug Tracker:** Comprehensive defect dashboard tracking defect type, severity (1–5), origin module, and 1-click status transitions (`Open` ➔ `In-Progress` ➔ `Resolved`).
+5. **Real-Time Audit Console:** Live in-app file stream capturing formatted timestamps, module traces, and error levels from `logs/system_errors.log`.
+6. **Embedded TQM SQC Suite:** In-app Pareto 80/20 analysis chart, Ishikawa (Fishbone) root cause diagram, interactive FMEA risk reduction matrix (93.1% RPN reduction), and PDCA Deming cycles.
+
+---
+
+## 🖥️ Modern & Aesthetic UI Features
+The desktop interface is built using CustomTkinter with a dark cyber slate aesthetic:
+- **Left Navigation Rail (Sidebar):** Quick switching between 5 dedicated workspaces:
+  - 📦 **Inventory Master:** Full stock visibility, real-time keystroke search, category filter, stock status pills (`✅ Healthy`, `⚠️ Low Stock`, `❌ Out of Stock`), column header sorting, and quick stock adjustment (`-5`, `-1`, `+1`, `+5`, custom delta).
+  - 🛡️ **Defect Tracker (Q09):** Defect interception logs, severity tags (`⚡ Sev 2`, `⚠️ Sev 3`, `🔥 Sev 4`), status filter, and 1-click lifecycle transitions.
+  - 📊 **TQM SQC Analytics:** Embedded high-resolution Pareto Chart, Ishikawa Fishbone Diagram, FMEA Risk Scorecard, and PDCA cycles.
+  - 🖥️ **Live System Logs:** Monospace terminal console rendering `logs/system_errors.log` with refresh, clear, and clipboard capabilities.
+  - ℹ️ **Knowledge Base & SOP:** Embedded documentation of Poka-Yoke rules, CTQ flowdown, and student credentials.
+- **Live KPI Ribbon:** Real-time metrics for Total SKUs, Warehouse Units, Asset Valuation (₹), Low Stock Alerts, and Trapped Defects.
+- **Interactive Modals:** Add Item modal featuring **Live Poka-Yoke Visual Feedback** (validating regex syntax and numeric bounds as the user types), and full Edit Item dialog.
+- **Export Engine:** One-click CSV inventory audit report generation.
+- **Examiner Demo Sandbox:** "⚡ Trigger Poka-Yoke Trap" button allowing instant demonstration of defect interception without crashes.
 
 ---
 
 ## 🏛️ System Architecture Flow
+```
 +-----------------------------------------------------------+
-|                    CustomTkinter GUI                      |
-|       (Inventory Master Tab & In-App Bug Tracker Tab)     |
+|               CustomTkinter Modern Dashboard              |
+|   (Sidebar Rail • Live KPIs • 5 Specialized Workspaces)    |
 +-----------------------------+-----------------------------+
-| User Inputs & Actions
-v
+                              | User Inputs & Actions
+                              v
 +-----------------------------------------------------------+
 |               Poka-Yoke Validation Layer                  |
 |     (Regex SKU Pattern, Bounds Checking, Numeric Cast)    |
-+--------------+-----------------------------+--------------+
-| Valid Data                  | Invalid Entry
++-----------------------------+-----------------------------+
+| Valid Data                  | Invalid Entry Trapped
 v                             v
 +-----------------------------+  +--------------------------+
-|       SQLite3 Engine        |  |  Bug Tracker & Logs      |
-| (items, bug_reports tables) |  |  - system_errors.log     |
-+-----------------------------+  |  - bug_reports table     |
-+--------------------------+
-
+|       SQLite3 Engine        |  |   Bug Tracker & Audit    |
+| (items, bug_reports tables) |  |   - system_errors.log    |
++-----------------------------+  |   - bug_reports table    |
+                                 +--------------------------+
+```
 
 ---
 
@@ -68,32 +85,47 @@ Identifies potential causes behind system defects across People, Process, Method
 
 ### 1. Clone Repository
 ```bash
-git clone [https://github.com/lokesh3ac-ai/BBAT104_TQM_2410302033.git](https://github.com/lokesh3ac-ai/BBAT104_TQM_2410302033.git)
+git clone https://github.com/lokesh3ac-ai/BBAT104_TQM_2410302033.git
 cd BBAT104_TQM_2410302033
-2. Install Dependencies
-Bash
+```
+
+### 2. Install Dependencies
+```bash
 pip install -r requirements.txt
-3. Initialize SQLite Database
-Bash
+```
+
+### 3. Initialize SQLite Database
+```bash
 python -m app.database
-4. Launch Desktop Application
-Bash
+```
+
+### 4. Launch Desktop Application
+```bash
 python -m app.gui
-5. Run Automated Test Suite
-Bash
+```
+
+### 5. Run Automated Test Suite
+```bash
 python -m unittest discover -s tests -p "test_*.py" -v
-6. Regenerate SQC Charts
-Bash
+```
+
+### 6. Regenerate SQC Charts
+```bash
 python -m tqm_tools.generate_pareto
 python -m tqm_tools.generate_fishbone
-📁 Repository Directory Structure
+```
+
+---
+
+## 📁 Repository Directory Structure
+```
 BBAT104_TQM_2410302033/
 ├── app/
 │   ├── __init__.py           # Package definition
 │   ├── database.py           # SQLite connection & schema initialization
-│   ├── inventory_logic.py    # CRUD operations & Poka-Yoke validations
-│   ├── bug_tracker.py        # Defect logging & database reporting engine
-│   └── gui.py                # CustomTkinter modern dark dashboard
+│   ├── inventory_logic.py    # CRUD operations, Poka-Yoke validations & stats
+│   ├── bug_tracker.py        # Defect logging, status workflow & DB reporting
+│   └── gui.py                # CustomTkinter aesthetic & modern UI dashboard
 ├── tests/
 │   ├── __init__.py
 │   └── test_inventory.py     # Automated unit test suite (6 passing tests)
@@ -111,3 +143,4 @@ BBAT104_TQM_2410302033/
 │   └── system_errors.log     # Runtime system error logs
 ├── requirements.txt          # Python project dependencies
 └── README.md                 # Project documentation & user guide
+```

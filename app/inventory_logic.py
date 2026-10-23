@@ -68,10 +68,24 @@ def add_item(sku, name, category, quantity, unit_price, reorder_level="5"):
         conn.commit()
         return True, "Item added successfully."
     except ValueError as ve:
+        if conn:
+            try:
+                conn.rollback()
+                conn.close()
+                conn = None
+            except Exception:
+                pass
         log_system_error("Validation", str(ve))
         log_bug_to_db("ValidationModule", "ValidationFailure", 2, f"Failed entry for SKU '{sku}': {ve}")
         return False, str(ve)
     except Exception as e:
+        if conn:
+            try:
+                conn.rollback()
+                conn.close()
+                conn = None
+            except Exception:
+                pass
         error_msg = str(e)
         if "UNIQUE constraint failed" in error_msg:
             msg = f"Item with SKU '{sku}' already exists."
@@ -85,7 +99,10 @@ def add_item(sku, name, category, quantity, unit_price, reorder_level="5"):
         return False, msg
     finally:
         if conn:
-            conn.close()
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 def get_all_items():
@@ -93,7 +110,7 @@ def get_all_items():
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT item_id, sku, name, category, quantity, unit_price, reorder_level FROM items ORDER BY item_id DESC")
+        cursor.execute("SELECT item_id, sku, name, category, quantity, unit_price, reorder_level, created_at FROM items ORDER BY item_id DESC")
         rows = cursor.fetchall()
         conn.close()
         return rows
@@ -102,23 +119,36 @@ def get_all_items():
         return []
 
 
-def delete_item(item_id: int):
-    """Safely deletes an item."""
+def delete_item(identifier):
+    """Safely deletes an item by SKU or numeric item_id."""
+    conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM items WHERE item_id = ?", (item_id,))
+        id_str = str(identifier).strip()
+        if id_str.isdigit():
+            cursor.execute("DELETE FROM items WHERE item_id = ? OR sku = ?", (int(id_str), id_str))
+        else:
+            cursor.execute("DELETE FROM items WHERE sku = ?", (id_str,))
+        
         conn.commit()
-        conn.close()
-        return True, "Item deleted successfully."
+        if cursor.rowcount == 0:
+            return False, f"Item '{identifier}' not found in database."
+        return True, f"Item '{identifier}' deleted successfully."
     except Exception as e:
         log_system_error("InventoryLogic", f"Delete error: {e}")
         log_bug_to_db("InventoryCRUD", "DeleteFailure", 3, str(e))
         return False, str(e)
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 def update_stock(sku: str, delta: int):
-    """Adjusts stock levels (Stock In / Stock Out)."""
+    """Adjusts stock levels (Stock In / Stock Out) with lower bound Poka-Yoke check."""
     conn = None
     try:
         conn = get_connection()
@@ -137,13 +167,147 @@ def update_stock(sku: str, delta: int):
         conn.commit()
         return True, f"Stock updated. New Quantity: {new_qty}"
     except ValueError as ve:
+        if conn:
+            try:
+                conn.rollback()
+                conn.close()
+                conn = None
+            except Exception:
+                pass
         log_system_error("StockControl", str(ve))
         log_bug_to_db("StockModule", "NegativeStockAttempt", 3, str(ve))
         return False, str(ve)
     except Exception as e:
+        if conn:
+            try:
+                conn.rollback()
+                conn.close()
+                conn = None
+            except Exception:
+                pass
         log_system_error("StockControl", f"Update error: {e}")
         log_bug_to_db("StockModule", "UpdateFailure", 4, str(e))
         return False, str(e)
     finally:
         if conn:
-            conn.close()
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
+def update_item_details(sku: str, name: str, category: str, unit_price: str, reorder_level: str):
+    """Updates non-stock attributes of an existing item with validation."""
+    conn = None
+    try:
+        # Validate input parameters
+        name = str(name).strip()
+        category = str(category).strip()
+        if not name or len(name) < 2:
+            raise ValueError("Item name must be at least 2 characters long.")
+        if not category:
+            raise ValueError("Category cannot be blank.")
+
+        try:
+            price = float(unit_price)
+        except ValueError:
+            raise ValueError("Unit price must be a valid number.")
+        if price <= 0:
+            raise ValueError("Unit price must be strictly greater than 0.")
+
+        try:
+            reorder = int(reorder_level)
+        except ValueError:
+            raise ValueError("Reorder level must be an integer.")
+        if reorder < 0:
+            raise ValueError("Reorder level cannot be negative.")
+
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            UPDATE items
+            SET name = ?, category = ?, unit_price = ?, reorder_level = ?
+            WHERE sku = ?
+            """,
+            (name, category, price, reorder, sku)
+        )
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, f"Item with SKU '{sku}' not found."
+        return True, f"Item '{sku}' updated successfully."
+    except ValueError as ve:
+        if conn:
+            try:
+                conn.rollback()
+                conn.close()
+                conn = None
+            except Exception:
+                pass
+        log_system_error("Validation", str(ve))
+        log_bug_to_db("ValidationModule", "ValidationFailure", 2, f"Failed update for SKU '{sku}': {ve}")
+        return False, str(ve)
+    except Exception as e:
+        if conn:
+            try:
+                conn.rollback()
+                conn.close()
+                conn = None
+            except Exception:
+                pass
+        log_system_error("InventoryLogic", f"Update item error: {e}")
+        log_bug_to_db("InventoryCRUD", "UpdateFailure", 4, str(e))
+        return False, str(e)
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
+def get_all_categories():
+    """Returns list of distinct categories present in inventory."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT category FROM items ORDER BY category ASC")
+        rows = cursor.fetchall()
+        conn.close()
+        return [r[0] for r in rows if r[0]]
+    except Exception:
+        return ["Peripherals", "Display", "Electronics", "Accessories"]
+
+
+def get_inventory_statistics():
+    """Computes high-level KPI metrics for the inventory dashboard."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as total_skus,
+                COALESCE(SUM(quantity), 0) as total_units,
+                COALESCE(SUM(quantity * unit_price), 0.0) as total_valuation,
+                COALESCE(SUM(CASE WHEN quantity <= reorder_level THEN 1 ELSE 0 END), 0) as low_stock_count,
+                COALESCE(SUM(CASE WHEN quantity = 0 THEN 1 ELSE 0 END), 0) as out_of_stock_count
+            FROM items
+        """)
+        row = cursor.fetchone()
+        conn.close()
+        return {
+            "total_skus": row[0] or 0,
+            "total_units": row[1] or 0,
+            "total_valuation": float(row[2] or 0.0),
+            "low_stock_count": row[3] or 0,
+            "out_of_stock_count": row[4] or 0
+        }
+    except Exception as e:
+        log_system_error("InventoryLogic", f"Stats calculation error: {e}")
+        return {
+            "total_skus": 0,
+            "total_units": 0,
+            "total_valuation": 0.0,
+            "low_stock_count": 0,
+            "out_of_stock_count": 0
+        }
