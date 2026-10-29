@@ -1,6 +1,26 @@
+import re
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.database import get_connection
+
+def validate_password_complexity(password: str) -> tuple[bool, str]:
+    """
+    Validates strict password complexity:
+    - Must contain at least one uppercase letter (A-Z)
+    - Must contain at least one numeric digit (0-9)
+    - Must contain at least one special character (e.g. @$!%*?&#)
+    Returns (True, "") or (False, "Password must include at least one uppercase letter, one number, and one special character.")
+    """
+    if not password:
+        return False, "Password cannot be empty."
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must include at least one uppercase letter, one number, and one special character."
+    if not re.search(r'[0-9]', password):
+        return False, "Password must include at least one uppercase letter, one number, and one special character."
+    if not re.search(r'[^A-Za-z0-9]', password):
+        return False, "Password must include at least one uppercase letter, one number, and one special character."
+    return True, ""
+
 
 def register_user(username: str, password: str, store_name: str = "", store_owner_name: str = ""):
     """
@@ -14,8 +34,12 @@ def register_user(username: str, password: str, store_name: str = "", store_owne
 
     if len(username) < 3:
         return False, "Username must be at least 3 characters long."
-    if len(password) < 4:
-        return False, "Password must be at least 4 characters long."
+    if len(username) > 13:
+        return False, "Username must not exceed 13 characters."
+
+    pw_ok, pw_err = validate_password_complexity(password)
+    if not pw_ok:
+        return False, pw_err
 
     conn = None
     try:
@@ -62,6 +86,9 @@ def authenticate_user(username: str, password: str):
 
     if not username or not password:
         return False, "Please enter both username and password."
+
+    if len(username) > 13:
+        return False, "Username must not exceed 13 characters."
 
     conn = None
     try:

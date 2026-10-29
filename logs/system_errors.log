@@ -39,3 +39,7 @@
 2026-10-29 23:18:44,475 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
 2026-10-29 23:19:01,404 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
 2026-10-29 23:19:01,435 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-30 01:03:38,920 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-30 01:03:38,953 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-30 01:04:14,648 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: items.sku
+2026-10-30 01:04:14,675 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10

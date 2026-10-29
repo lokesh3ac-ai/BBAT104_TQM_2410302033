@@ -50,6 +50,10 @@ def launch_desktop_window(url):
             window_size,
             "--disable-extensions",
             "--disable-plugins",
+            "--disable-save-password-bubble",
+            "--disable-autofill",
+            "--disable-features=AutofillServerCommunication,AutofillEnableAccountWalletStorage,PasswordManager",
+            "--password-store=basic",
             f"--user-data-dir={os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'browser_profile')}"
         ]
         try:

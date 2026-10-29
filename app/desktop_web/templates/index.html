@@ -71,28 +71,33 @@
       </div>
 
       <!-- LOGIN FORM -->
-      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+      <form id="form-login" onsubmit="handleLogin(event)" autocomplete="off" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Username</label>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Username</label>
+            <span class="text-[10px] text-slate-400">Max 13 chars</span>
+          </div>
           <div class="relative">
             <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="text" id="login-username" placeholder="Enter your username" required
+            <input type="text" id="login-username" value="" placeholder="Enter your username" required maxlength="13" autocomplete="off"
+              oninput="handleUsernameValidation('login-username', 'login-username-error')"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
+          <p id="login-username-error" class="hidden text-[11px] text-rose-500 font-medium mt-1">Username must not exceed 13 characters.</p>
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
           <div class="relative">
             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="password" id="login-password" placeholder="Enter your password" required
+            <input type="password" id="login-password" value="" placeholder="Enter your password" required autocomplete="new-password"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
         </div>
 
         <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">
           <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" id="login-remember" checked class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+            <input type="checkbox" id="login-remember" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
             <span>Remember session</span>
           </label>
         </div>
@@ -105,34 +110,58 @@
       </form>
 
       <!-- REGISTRATION FORM -->
-      <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-3.5">
+      <form id="form-register" onsubmit="handleRegister(event)" autocomplete="off" class="hidden space-y-3.5">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Username (min 3 chars)</label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Username (3 - 13 chars)</label>
+            <span class="text-[10px] text-slate-400">Max 13 chars</span>
+          </div>
           <div class="relative">
             <i data-lucide="user-plus" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="text" id="reg-username" placeholder="Choose a username" required minlength="3"
+            <input type="text" id="reg-username" value="" placeholder="Choose a username" required minlength="3" maxlength="13" autocomplete="off"
+              oninput="handleUsernameValidation('reg-username', 'reg-username-error')"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
+          <p id="reg-username-error" class="hidden text-[11px] text-rose-500 font-medium mt-1">Username must not exceed 13 characters.</p>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password (min 4 chars)</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password</label>
           <div class="relative">
             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="password" id="reg-password" placeholder="Create a secure password" required minlength="4"
+            <input type="password" id="reg-password" value="" placeholder="Create a strong password" required autocomplete="new-password"
+              oninput="handlePasswordInput(this.value)"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
+          
+          <!-- Strict Password Complexity Rule Indicators -->
+          <div class="mt-2 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-1">
+            <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Complexity Requirements:</p>
+            <div id="rule-upper" class="flex items-center space-x-1.5 text-[11px] text-slate-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 indicator-dot"></span>
+              <span>At least one uppercase letter (A-Z)</span>
+            </div>
+            <div id="rule-number" class="flex items-center space-x-1.5 text-[11px] text-slate-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 indicator-dot"></span>
+              <span>At least one numeric digit (0-9)</span>
+            </div>
+            <div id="rule-special" class="flex items-center space-x-1.5 text-[11px] text-slate-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 indicator-dot"></span>
+              <span>At least one special character (@$!%*?&#)</span>
+            </div>
+          </div>
+          <p id="reg-password-error" class="hidden text-[11px] text-rose-500 font-semibold mt-1">Password must include at least one uppercase letter, one number, and one special character.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-2.5">
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Store Name</label>
-            <input type="text" id="reg-store-name" placeholder="e.g. Apex Mart"
+            <input type="text" id="reg-store-name" value="" placeholder="e.g. Apex Mart" autocomplete="off"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Owner Name</label>
-            <input type="text" id="reg-owner-name" placeholder="e.g. Lokesh Maurya"
+            <input type="text" id="reg-owner-name" value="" placeholder="e.g. Lokesh Maurya" autocomplete="off"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
         </div>
@@ -838,6 +867,23 @@
     let selectedDetailItem = null;
 
     document.addEventListener("DOMContentLoaded", () => {
+      // Clear inputs strictly on initial launch
+      const lu = document.getElementById('login-username');
+      const lp = document.getElementById('login-password');
+      const ru = document.getElementById('reg-username');
+      const rp = document.getElementById('reg-password');
+      const rs = document.getElementById('reg-store-name');
+      const ro = document.getElementById('reg-owner-name');
+      const lr = document.getElementById('login-remember');
+      if (lu) lu.value = '';
+      if (lp) lp.value = '';
+      if (ru) ru.value = '';
+      if (rp) rp.value = '';
+      if (rs) rs.value = '';
+      if (ro) ro.value = '';
+      if (lr) lr.checked = false;
+      clearAuthErrors();
+
       lucide.createIcons();
       initTheme();
       checkAuthSession();
@@ -878,8 +924,88 @@
     }
 
     // =========================================================================
-    // AUTHENTICATION SYSTEM (LOGIN & SIGN UP)
+    // AUTHENTICATION & VALIDATION SYSTEM
     // =========================================================================
+    function handleUsernameValidation(inputId, errorId) {
+      const input = document.getElementById(inputId);
+      const errorEl = document.getElementById(errorId);
+      if (!input || !errorEl) return;
+
+      if (input.value.length > 13) {
+        errorEl.textContent = "Username must not exceed 13 characters.";
+        errorEl.classList.remove('hidden');
+        input.classList.add('border-rose-500', 'focus:border-rose-500');
+        input.classList.remove('border-slate-200', 'dark:border-slate-700', 'focus:border-emerald-500');
+        input.value = input.value.slice(0, 13);
+      } else {
+        errorEl.classList.add('hidden');
+        input.classList.remove('border-rose-500', 'focus:border-rose-500');
+        input.classList.add('border-slate-200', 'dark:border-slate-700', 'focus:border-emerald-500');
+      }
+    }
+
+    function checkPasswordComplexity(pw) {
+      const hasUpper = /[A-Z]/.test(pw);
+      const hasNumber = /[0-9]/.test(pw);
+      const hasSpecial = /[^A-Za-z0-9]/.test(pw);
+      return {
+        hasUpper,
+        hasNumber,
+        hasSpecial,
+        isValid: hasUpper && hasNumber && hasSpecial
+      };
+    }
+
+    function handlePasswordInput(pw) {
+      const res = checkPasswordComplexity(pw);
+      const errEl = document.getElementById('reg-password-error');
+      const inputEl = document.getElementById('reg-password');
+
+      updateRuleIndicator('rule-upper', res.hasUpper);
+      updateRuleIndicator('rule-number', res.hasNumber);
+      updateRuleIndicator('rule-special', res.hasSpecial);
+
+      if (res.isValid && errEl && !errEl.classList.contains('hidden')) {
+        errEl.classList.add('hidden');
+        if (inputEl) {
+          inputEl.classList.remove('border-rose-500', 'focus:border-rose-500');
+          inputEl.classList.add('border-slate-200', 'dark:border-slate-700', 'focus:border-emerald-500');
+        }
+      }
+    }
+
+    function updateRuleIndicator(elemId, satisfied) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const dot = el.querySelector('.indicator-dot');
+      if (satisfied) {
+        el.className = 'flex items-center space-x-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium';
+        if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 indicator-dot';
+      } else {
+        el.className = 'flex items-center space-x-1.5 text-[11px] text-slate-400';
+        if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 indicator-dot';
+      }
+    }
+
+    function clearAuthErrors() {
+      ['login-username-error', 'reg-username-error', 'reg-password-error'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      ['login-username', 'login-password', 'reg-username', 'reg-password'].forEach(id => {
+        const inp = document.getElementById(id);
+        if (inp) {
+          inp.classList.remove('border-rose-500', 'focus:border-rose-500');
+          inp.classList.add('border-slate-200', 'dark:border-slate-700', 'focus:border-emerald-500');
+        }
+      });
+
+      updateRuleIndicator('rule-upper', false);
+      updateRuleIndicator('rule-number', false);
+      updateRuleIndicator('rule-special', false);
+    }
+
     function setAuthTab(tab) {
       const isLogin = tab === 'login';
       document.getElementById('form-login').classList.toggle('hidden', !isLogin);
@@ -892,6 +1018,16 @@
       document.getElementById('tab-auth-register').className = !isLogin 
         ? 'flex-1 py-2 rounded-lg bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs transition'
         : 'flex-1 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
+
+      // Clear input fields strictly whenever switching between "Sign In" and "Create Account" tabs
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      document.getElementById('reg-username').value = '';
+      document.getElementById('reg-password').value = '';
+      document.getElementById('reg-store-name').value = '';
+      document.getElementById('reg-owner-name').value = '';
+
+      clearAuthErrors();
     }
 
     async function checkAuthSession() {
@@ -920,8 +1056,24 @@
 
     async function handleLogin(e) {
       e.preventDefault();
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-password').value.trim();
+      const userEl = document.getElementById('login-username');
+      const passEl = document.getElementById('login-password');
+      const username = userEl.value.trim();
+      const password = passEl.value;
+
+      clearAuthErrors();
+
+      // Username length validation (max 13 chars)
+      if (username.length > 13) {
+        const errEl = document.getElementById('login-username-error');
+        if (errEl) {
+          errEl.textContent = "Username must not exceed 13 characters.";
+          errEl.classList.remove('hidden');
+        }
+        userEl.classList.add('border-rose-500', 'focus:border-rose-500');
+        showToast("Username must not exceed 13 characters.", "error");
+        return;
+      }
 
       try {
         const res = await fetch('/api/auth/login', {
@@ -932,12 +1084,23 @@
         const data = await res.json();
         if (data.success) {
           currentUser = data.user;
-          if (document.getElementById('login-remember').checked) {
+          const rem = document.getElementById('login-remember');
+          if (rem && rem.checked) {
             localStorage.setItem('aeroflow_session', JSON.stringify(currentUser));
+          } else {
+            localStorage.removeItem('aeroflow_session');
           }
           renderAuthenticatedApp();
           showToast(`Welcome back, ${currentUser.username}!`, 'success');
         } else {
+          if (data.message && data.message.includes('Username must not exceed 13 characters')) {
+            const errEl = document.getElementById('login-username-error');
+            if (errEl) {
+              errEl.textContent = data.message;
+              errEl.classList.remove('hidden');
+            }
+            userEl.classList.add('border-rose-500');
+          }
           showToast(data.message || 'Invalid username or password', 'error');
         }
       } catch (err) {
@@ -947,10 +1110,39 @@
 
     async function handleRegister(e) {
       e.preventDefault();
-      const username = document.getElementById('reg-username').value.trim();
-      const password = document.getElementById('reg-password').value.trim();
+      const userEl = document.getElementById('reg-username');
+      const passEl = document.getElementById('reg-password');
+      const username = userEl.value.trim();
+      const password = passEl.value;
       const store_name = document.getElementById('reg-store-name').value.trim();
       const store_owner_name = document.getElementById('reg-owner-name').value.trim();
+
+      clearAuthErrors();
+
+      // Username length validation (max 13 chars)
+      if (username.length > 13) {
+        const errEl = document.getElementById('reg-username-error');
+        if (errEl) {
+          errEl.textContent = "Username must not exceed 13 characters.";
+          errEl.classList.remove('hidden');
+        }
+        userEl.classList.add('border-rose-500', 'focus:border-rose-500');
+        showToast("Username must not exceed 13 characters.", "error");
+        return;
+      }
+
+      // Strict Password Complexity Enforcement
+      const pwCheck = checkPasswordComplexity(password);
+      if (!pwCheck.isValid) {
+        const pwErr = document.getElementById('reg-password-error');
+        if (pwErr) {
+          pwErr.textContent = "Password must include at least one uppercase letter, one number, and one special character.";
+          pwErr.classList.remove('hidden');
+        }
+        passEl.classList.add('border-rose-500', 'focus:border-rose-500');
+        showToast("Password must include at least one uppercase letter, one number, and one special character.", "error");
+        return;
+      }
 
       try {
         const res = await fetch('/api/auth/register', {
@@ -961,10 +1153,30 @@
         const data = await res.json();
         if (data.success) {
           currentUser = data.user;
-          localStorage.setItem('aeroflow_session', JSON.stringify(currentUser));
+          const rem = document.getElementById('login-remember');
+          if (rem && rem.checked) {
+            localStorage.setItem('aeroflow_session', JSON.stringify(currentUser));
+          } else {
+            localStorage.removeItem('aeroflow_session');
+          }
           renderAuthenticatedApp();
           showToast(data.message, 'success');
         } else {
+          if (data.message && data.message.includes('Username must not exceed 13 characters')) {
+            const errEl = document.getElementById('reg-username-error');
+            if (errEl) {
+              errEl.textContent = data.message;
+              errEl.classList.remove('hidden');
+            }
+            userEl.classList.add('border-rose-500');
+          } else if (data.message && data.message.includes('Password must include')) {
+            const pwErr = document.getElementById('reg-password-error');
+            if (pwErr) {
+              pwErr.textContent = data.message;
+              pwErr.classList.remove('hidden');
+            }
+            passEl.classList.add('border-rose-500');
+          }
           showToast(data.message || 'Registration failed', 'error');
         }
       } catch (err) {
@@ -1012,8 +1224,20 @@
     function renderLoginScreen() {
       document.getElementById('app-shell').classList.add('hidden');
       document.getElementById('login-view').classList.remove('hidden');
+      
+      // Ensure fields are strictly blank
       document.getElementById('login-username').value = '';
       document.getElementById('login-password').value = '';
+      document.getElementById('reg-username').value = '';
+      document.getElementById('reg-password').value = '';
+      document.getElementById('reg-store-name').value = '';
+      document.getElementById('reg-owner-name').value = '';
+      
+      // Uncheck remember session by default
+      const rem = document.getElementById('login-remember');
+      if (rem) rem.checked = false;
+
+      clearAuthErrors();
       setAuthTab('login');
       lucide.createIcons();
     }

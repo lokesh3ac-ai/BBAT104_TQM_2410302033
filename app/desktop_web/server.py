@@ -78,6 +78,9 @@ def api_login():
     username = data.get("username", "")
     password = data.get("password", "")
 
+    if len(str(username).strip()) > 13:
+        return jsonify({"success": False, "message": "Username must not exceed 13 characters."}), 400
+
     success, result = authenticate_user(username, password)
     if not success:
         return jsonify({"success": False, "message": result}), 401
