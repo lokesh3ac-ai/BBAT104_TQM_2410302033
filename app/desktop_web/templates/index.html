@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AERO-FLOW // Inventory & Quality Management Suite</title>
+  <title>INVENTORY MANAGEMENT SYSTEM</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -35,91 +36,149 @@
   <style>
     /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
   </style>
 </head>
-<body class="bg-white text-slate-800 font-sans antialiased h-screen overflow-hidden flex flex-col select-none">
+<body class="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased h-screen overflow-hidden flex flex-col select-none transition-colors duration-200">
 
   <!-- ===================================================================== -->
-  <!-- 1. AUTHENTICATION VIEW (LOGIN SCREEN) -->
+  <!-- 1. AUTHENTICATION VIEW (LOGIN & SIGN UP TABS) -->
   <!-- ===================================================================== -->
-  <div id="login-view" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-8 space-y-6">
+  <div id="login-view" class="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl p-8 space-y-6">
       
       <!-- Brand Logo & Header -->
       <div class="text-center space-y-2">
         <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 items-center justify-center text-white shadow-lg shadow-emerald-500/20 mb-1">
-          <i data-lucide="shield-check" class="w-6 h-6"></i>
+          <i data-lucide="boxes" class="w-6 h-6"></i>
         </div>
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900">AERO-FLOW</h1>
-        <p class="text-xs text-slate-500">Inventory & Quality Control Workspace</p>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">INVENTORY MANAGEMENT SYSTEM</h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Enterprise Stock & Defect Tracking Platform</p>
       </div>
 
-      <!-- Login Form -->
-      <form onsubmit="handleLogin(event)" class="space-y-4">
+      <!-- Auth Tabs: Login vs Sign Up -->
+      <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold">
+        <button type="button" onclick="setAuthTab('login')" id="tab-auth-login" class="flex-1 py-2 rounded-lg bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs transition">
+          Sign In
+        </button>
+        <button type="button" onclick="setAuthTab('register')" id="tab-auth-register" class="flex-1 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+          Create Account
+        </button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Username</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Username</label>
           <div class="relative">
             <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="text" id="login-username" value="Lokesh Maurya" placeholder="Enter username" required
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition">
+            <input type="text" id="login-username" placeholder="Enter your username" required
+              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
           <div class="relative">
             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="password" id="login-password" value="••••••••" placeholder="Enter password" required
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition">
+            <input type="password" id="login-password" placeholder="Enter your password" required
+              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
         </div>
 
-        <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">
           <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" id="remember-me" checked class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+            <input type="checkbox" id="login-remember" checked class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
             <span>Remember session</span>
           </label>
-          <span class="text-slate-400 text-[11px]">Desktop Edition</span>
         </div>
 
         <button type="submit"
           class="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-md shadow-emerald-600/20 active:scale-[0.99]">
           <i data-lucide="log-in" class="w-4 h-4"></i>
-          <span>Sign In to Workspace</span>
+          <span>Sign In to System</span>
+        </button>
+      </form>
+
+      <!-- REGISTRATION FORM -->
+      <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Username (min 3 chars)</label>
+          <div class="relative">
+            <i data-lucide="user-plus" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+            <input type="text" id="reg-username" placeholder="Choose a username" required minlength="3"
+              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password (min 4 chars)</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+            <input type="password" id="reg-password" placeholder="Create a secure password" required minlength="4"
+              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Store Name</label>
+            <input type="text" id="reg-store-name" placeholder="e.g. Apex Mart"
+              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Owner Name</label>
+            <input type="text" id="reg-owner-name" placeholder="e.g. Lokesh Maurya"
+              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
+          </div>
+        </div>
+
+        <button type="submit"
+          class="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-md shadow-emerald-600/20 active:scale-[0.99] mt-2">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <span>Create Account & Continue</span>
         </button>
       </form>
 
       <!-- System Notice -->
-      <div class="pt-3 border-t border-slate-100 text-center">
-        <p class="text-[11px] text-slate-400">Poka-Yoke Protected • SQLite Persistence</p>
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 text-center">
+        <p class="text-[11px] text-slate-400">Poka-Yoke Protected • SQLite Database</p>
       </div>
     </div>
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 2. MAIN APPLICATION SHELL (AFTER LOGIN) -->
+  <!-- 2. MAIN APPLICATION SHELL -->
   <!-- ===================================================================== -->
   <div id="app-shell" class="hidden flex flex-col h-screen overflow-hidden">
     
     <!-- TOP APPLICATION HEADER -->
-    <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 z-20">
+    <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between shrink-0 z-20 transition-colors">
       
-      <!-- Left: Logo, Name & User Greeting -->
+      <!-- Left: Logo & Global Branding -->
       <div class="flex items-center space-x-4">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center font-bold text-white shadow-md shadow-emerald-500/20">
-          <i data-lucide="shield-check" class="w-5 h-5"></i>
+          <i data-lucide="boxes" class="w-5 h-5"></i>
         </div>
         
         <div class="flex items-center space-x-3">
-          <span class="font-bold tracking-wider text-base text-slate-900">AERO-FLOW</span>
-          <span class="h-4 w-px bg-slate-200"></span>
+          <span class="font-bold tracking-wider text-sm md:text-base text-slate-900 dark:text-white uppercase">INVENTORY MANAGEMENT SYSTEM</span>
+          
+          <span class="h-4 w-px bg-slate-200 dark:bg-slate-700"></span>
+
+          <!-- Dynamic Store Name Badge / Prompt Button -->
+          <div id="header-store-badge-container">
+            <!-- Injected via JavaScript -->
+          </div>
+
           <!-- User Greeting Badge -->
-          <div class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-xs font-medium text-emerald-800">
+          <div class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span id="user-greeting-text">Hello, Lokesh Maurya</span>
+            <span id="user-greeting-text">Hello, User</span>
           </div>
         </div>
       </div>
@@ -131,17 +190,17 @@
           <span>Add Verified Item</span>
         </button>
         
-        <button onclick="exportCSV()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-medium transition" title="Export CSV Report">
-          <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
+        <button onclick="exportCSV()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium transition" title="Export CSV Report">
+          <i data-lucide="download" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
           <span>Export CSV</span>
         </button>
 
-        <button onclick="refreshAll()" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition" title="Refresh All Data">
-          <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-500" id="refreshIcon"></i>
+        <button onclick="refreshAll()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition" title="Refresh All Data">
+          <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-500 dark:text-slate-400" id="refreshIcon"></i>
         </button>
 
         <!-- Dedicated Logout Button -->
-        <button onclick="handleLogout()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium transition ml-1" title="End Session & Return to Login">
+        <button onclick="handleLogout()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 text-xs font-medium transition ml-1" title="End Session">
           <i data-lucide="log-out" class="w-4 h-4 text-rose-500"></i>
           <span>Logout</span>
         </button>
@@ -152,107 +211,131 @@
     <div class="flex flex-1 overflow-hidden">
       
       <!-- LEFT SIDEBAR -->
-      <aside class="w-64 bg-slate-50/80 border-r border-slate-200 flex flex-col justify-between shrink-0 p-3">
+      <aside class="w-64 bg-slate-50/80 dark:bg-slate-900/60 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 p-3 transition-colors">
         <div class="space-y-1">
           <div class="px-3 py-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Workspaces</div>
           
           <!-- 1. Inventory Master -->
-          <button onclick="switchView('inventory')" id="nav-inventory" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 transition group">
+          <button onclick="switchView('inventory')" id="nav-inventory" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 transition group">
             <div class="flex items-center space-x-2.5">
               <i data-lucide="boxes" class="w-4 h-4 text-emerald-600"></i>
               <span>Inventory Master</span>
             </div>
-            <span id="badge-sku-count" class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono font-bold">0</span>
+            <span id="badge-sku-count" class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 font-mono font-bold">0</span>
           </button>
 
-          <!-- 2. Defect Tracker (Q09) -->
-          <button onclick="switchView('bugs')" id="nav-bugs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition group">
+          <!-- 2. Defect Tracker (Cleaned Label: strictly 'Defect Tracker') -->
+          <button onclick="switchView('bugs')" id="nav-bugs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition group">
             <div class="flex items-center space-x-2.5">
               <i data-lucide="shield-alert" class="w-4 h-4 text-rose-500"></i>
-              <span>Defect Tracker (Q09)</span>
+              <span>Defect Tracker</span>
             </div>
-            <span id="badge-open-bugs" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-mono font-bold">0</span>
+            <span id="badge-open-bugs" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 font-mono font-bold">0</span>
           </button>
 
           <!-- 3. Live Audit Console -->
-          <button onclick="switchView('logs')" id="nav-logs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition group">
+          <button onclick="switchView('logs')" id="nav-logs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition group">
             <div class="flex items-center space-x-2.5">
               <i data-lucide="terminal" class="w-4 h-4 text-amber-500"></i>
               <span>Live Audit Console</span>
             </div>
           </button>
+
+          <!-- 4. Settings Workspace -->
+          <button onclick="switchView('settings')" id="nav-settings" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition group">
+            <div class="flex items-center space-x-2.5">
+              <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
+              <span>Settings</span>
+            </div>
+          </button>
         </div>
 
-        <!-- Clean System Status Box (Replaces Academic Metadata Card) -->
-        <div class="p-3 rounded-xl bg-white border border-slate-200 text-xs shadow-xs space-y-1.5">
-          <div class="flex items-center justify-between text-slate-700">
+        <!-- Clean Status Footer -->
+        <div class="p-3 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs shadow-xs space-y-1.5">
+          <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
             <div class="flex items-center space-x-2">
               <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span class="font-semibold text-slate-800">System Ready</span>
+              <span class="font-semibold text-slate-800 dark:text-white">System Active</span>
             </div>
-            <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Active</span>
+            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">Online</span>
           </div>
           <div class="flex items-center justify-between text-[11px] text-slate-400">
             <span>Database:</span>
-            <span class="font-mono text-slate-600 font-medium">SQLite 3.x</span>
+            <span class="font-mono text-slate-600 dark:text-slate-400 font-medium">SQLite 3.x</span>
           </div>
         </div>
       </aside>
 
       <!-- MAIN WORKSPACE CONTENT -->
-      <main class="flex-1 overflow-y-auto bg-slate-50/50 p-6 flex flex-col space-y-4">
+      <main class="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-slate-950 p-6 flex flex-col space-y-4">
         
+        <!-- Interactive Store Setup Prompt Banner (shows when store name is not set) -->
+        <div id="store-setup-banner" class="hidden p-4 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between shadow-xs">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+              <i data-lucide="store" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Welcome to Inventory Management System!</div>
+              <div class="text-[11px] text-slate-600 dark:text-slate-400">Configure your Store Name and Owner Details to personalize your invoices and dashboard.</div>
+            </div>
+          </div>
+          <button onclick="switchView('settings')" class="flex items-center space-x-1 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition">
+            <span>Set Your Store Name</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
         <!-- KPI METRIC RIBBON -->
         <section class="grid grid-cols-2 md:grid-cols-5 gap-3.5 shrink-0">
-          
           <!-- Card 1: Total SKUs -->
-          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-emerald-300 transition">
-            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-emerald-300 transition">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
               <span>TOTAL SKUs</span>
               <i data-lucide="box" class="w-4 h-4 text-emerald-600"></i>
             </div>
-            <div class="text-2xl font-bold font-mono text-slate-900 my-1" id="kpi-skus">0</div>
+            <div class="text-2xl font-bold font-mono text-slate-900 dark:text-white my-1" id="kpi-skus">0</div>
             <div class="text-[11px] text-slate-400">Active Catalog Items</div>
           </div>
 
           <!-- Card 2: Total Units -->
-          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-blue-300 transition">
-            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-blue-300 transition">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
               <span>TOTAL STOCK</span>
               <i data-lucide="layers" class="w-4 h-4 text-blue-600"></i>
             </div>
-            <div class="text-2xl font-bold font-mono text-blue-700 my-1" id="kpi-units">0</div>
+            <div class="text-2xl font-bold font-mono text-blue-700 dark:text-blue-400 my-1" id="kpi-units">0</div>
             <div class="text-[11px] text-slate-400">Warehouse Units</div>
           </div>
 
           <!-- Card 3: Asset Valuation -->
-          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-purple-300 transition">
-            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-purple-300 transition">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
               <span>VALUATION</span>
               <i data-lucide="indian-rupee" class="w-4 h-4 text-purple-600"></i>
             </div>
-            <div class="text-2xl font-bold font-mono text-purple-700 my-1 truncate" id="kpi-val">₹ 0.00</div>
+            <div class="text-2xl font-bold font-mono text-purple-700 dark:text-purple-400 my-1 truncate" id="kpi-val">₹ 0.00</div>
             <div class="text-[11px] text-slate-400">Inventory Asset Worth</div>
           </div>
 
           <!-- Card 4: Low Stock Alerts -->
-          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-amber-300 transition">
-            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-amber-300 transition">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
               <span>LOW STOCK</span>
               <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
             </div>
-            <div class="text-2xl font-bold font-mono text-amber-600 my-1" id="kpi-low">0</div>
-            <div class="text-[11px] text-slate-400">≤ Reorder Level</div>
+            <div class="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 my-1" id="kpi-low">0</div>
+            <div class="text-[11px] text-slate-400">≤ Reorder Threshold</div>
           </div>
 
           <!-- Card 5: Trapped Defects -->
-          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-rose-300 transition">
-            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-rose-300 transition">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
               <span>TRAPPED BUGS</span>
               <i data-lucide="bug" class="w-4 h-4 text-rose-500"></i>
             </div>
-            <div class="text-2xl font-bold font-mono text-rose-600 my-1" id="kpi-bugs">0</div>
-            <div class="text-[11px] text-emerald-600 font-medium">100% Intercepted</div>
+            <div class="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400 my-1" id="kpi-bugs">0</div>
+            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">100% Intercepted</div>
           </div>
         </section>
 
@@ -262,33 +345,33 @@
         <section id="view-inventory" class="flex-1 flex flex-col space-y-3">
           
           <!-- Toolbar & Filters -->
-          <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center space-x-3 flex-1 min-w-[280px]">
               <div class="relative flex-1">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
                 <input type="text" id="inv-search" oninput="filterInventoryTable()" placeholder="Search by SKU, Name, or Category..." 
-                  class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+                  class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
               </div>
               <select id="inv-cat-filter" onchange="filterInventoryTable()" 
-                class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-emerald-500">
+                class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-emerald-500">
                 <option value="ALL">All Categories</option>
               </select>
             </div>
 
             <!-- Quick Status Filter Pills -->
-            <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
-              <button onclick="setStockStatusFilter('ALL')" id="pill-all" class="px-2.5 py-1 rounded font-medium bg-white text-emerald-700 shadow-xs transition">All Items</button>
-              <button onclick="setStockStatusFilter('LOW')" id="pill-low" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition">⚠️ Low Stock</button>
-              <button onclick="setStockStatusFilter('HEALTHY')" id="pill-healthy" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition">✅ Healthy</button>
-              <button onclick="setStockStatusFilter('OUT')" id="pill-out" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition">❌ Out of Stock</button>
+            <div class="flex items-center space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
+              <button onclick="setStockStatusFilter('ALL')" id="pill-all" class="px-2.5 py-1 rounded font-medium bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs transition">All Items</button>
+              <button onclick="setStockStatusFilter('LOW')" id="pill-low" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">⚠️ Low Stock</button>
+              <button onclick="setStockStatusFilter('HEALTHY')" id="pill-healthy" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">✅ Healthy</button>
+              <button onclick="setStockStatusFilter('OUT')" id="pill-out" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">❌ Out of Stock</button>
             </div>
           </div>
 
-          <!-- Inventory Table -->
-          <div class="flex-1 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <!-- Inventory Table with Clickable Rows -->
+          <div class="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col">
             <div class="overflow-x-auto overflow-y-auto max-h-[500px]">
               <table class="w-full text-left text-xs border-collapse">
-                <thead class="bg-slate-50 sticky top-0 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider">
+                <thead class="bg-slate-50 dark:bg-slate-800/80 sticky top-0 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider">
                   <tr>
                     <th class="py-3 px-4">SKU Code</th>
                     <th class="py-3 px-4">Item Name</th>
@@ -301,7 +384,7 @@
                     <th class="py-3 px-4 text-center">Quick Adjust & Actions</th>
                   </tr>
                 </thead>
-                <tbody id="inventory-table-body" class="divide-y divide-slate-100 text-slate-700">
+                <tbody id="inventory-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                   <!-- Dynamically populated -->
                 </tbody>
               </table>
@@ -310,43 +393,41 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- VIEW 2: DEFECT TRACKER (Q09) -->
+        <!-- VIEW 2: DEFECT TRACKER (CLEANED) -->
         <!-- ================================================================= -->
         <section id="view-bugs" class="hidden flex-1 flex flex-col space-y-3">
           
-          <!-- Defect Filter Toolbar -->
-          <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center space-x-2">
-              <span class="text-xs font-bold text-slate-800">🛡️ Defect Lifecycle Workflow</span>
-              <span class="text-[11px] text-slate-400">• Quality Goal Verification</span>
+              <span class="text-xs font-bold text-slate-800 dark:text-white">🛡️ Defect Lifecycle Workflow</span>
+              <span class="text-[11px] text-slate-400">• Quality Validation Logs</span>
             </div>
 
             <div class="flex items-center space-x-2">
-              <select id="bug-status-filter" onchange="filterBugsTable()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-emerald-500">
+              <select id="bug-status-filter" onchange="filterBugsTable()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-emerald-500">
                 <option value="ALL">All Statuses</option>
                 <option value="Open">Open</option>
                 <option value="In-Progress">In-Progress</option>
                 <option value="Resolved">Resolved</option>
               </select>
               
-              <select id="bug-sev-filter" onchange="filterBugsTable()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-emerald-500">
+              <select id="bug-sev-filter" onchange="filterBugsTable()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-emerald-500">
                 <option value="ALL">All Severities</option>
                 <option value="4-5">Severity 4-5 (Critical / DB)</option>
                 <option value="2-3">Severity 2-3 (Validation / Stock)</option>
                 <option value="1">Severity 1 (Info)</option>
               </select>
 
-              <button onclick="clearResolvedBugs()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-medium transition">
+              <button onclick="clearResolvedBugs()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium transition">
                 🧹 Clear Resolved
               </button>
             </div>
           </div>
 
-          <!-- Bugs Table -->
-          <div class="flex-1 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col">
             <div class="overflow-x-auto overflow-y-auto max-h-[500px]">
               <table class="w-full text-left text-xs border-collapse">
-                <thead class="bg-slate-50 sticky top-0 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider">
+                <thead class="bg-slate-50 dark:bg-slate-800/80 sticky top-0 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider">
                   <tr>
                     <th class="py-3 px-4 text-center">ID</th>
                     <th class="py-3 px-4">Timestamp</th>
@@ -358,8 +439,8 @@
                     <th class="py-3 px-4 text-center">Transition Actions</th>
                   </tr>
                 </thead>
-                <tbody id="bugs-table-body" class="divide-y divide-slate-100 text-slate-700">
-                  <!-- Dynamically populated -->
+                <tbody id="bugs-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                  <!-- Injected via JavaScript -->
                 </tbody>
               </table>
             </div>
@@ -371,24 +452,147 @@
         <!-- ================================================================= -->
         <section id="view-logs" class="hidden flex-1 flex flex-col space-y-3">
           
-          <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+          <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
             <div class="flex items-center space-x-2">
-              <span class="text-xs font-bold text-slate-800">🖥️ File Stream: logs/system_errors.log</span>
-              <span class="text-[10px] text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">• Live Stream</span>
+              <span class="text-xs font-bold text-slate-800 dark:text-white">🖥️ File Stream: logs/system_errors.log</span>
+              <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">• Real-Time Stream</span>
             </div>
             <div class="flex items-center space-x-2">
-              <button onclick="loadLogs()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs transition">
+              <button onclick="loadLogs()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs transition">
                 🔄 Refresh Logs
               </button>
-              <button onclick="clearLogs()" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs transition">
+              <button onclick="clearLogs()" class="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 text-xs transition">
                 🗑️ Clear Buffer
               </button>
             </div>
           </div>
 
-          <!-- Console Stream Window -->
           <div class="flex-1 bg-slate-900 rounded-xl border border-slate-800 p-4 font-mono text-xs overflow-y-auto max-h-[500px] text-emerald-400 space-y-1 shadow-inner" id="log-console">
             <!-- Logs injected here -->
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VIEW 4: DEDICATED SETTINGS WORKSPACE -->
+        <!-- ================================================================= -->
+        <section id="view-settings" class="hidden flex-1 space-y-6">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Section A: Store Settings -->
+            <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <div class="flex items-center space-x-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600">
+                  <i data-lucide="store" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">Store Configuration</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Configure your Store Name and Owner Branding</p>
+                </div>
+              </div>
+
+              <form onsubmit="handleSaveStoreSettings(event)" class="space-y-3.5">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Store Name</label>
+                  <input type="text" id="settings-store-name" placeholder="e.g. Apex Hardware & Electronics" 
+                    class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Store Owner Name</label>
+                  <input type="text" id="settings-owner-name" placeholder="e.g. Lokesh Maurya" 
+                    class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-sm shadow-emerald-600/30">
+                  Save Store Settings
+                </button>
+              </form>
+            </div>
+
+            <!-- Section B: Profile & Account Details -->
+            <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <div class="flex items-center space-x-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600">
+                  <i data-lucide="user-check" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">Profile & Account Details</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Your credentials and access parameters</p>
+                </div>
+              </div>
+
+              <div class="space-y-3 text-xs">
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
+                  <span class="text-slate-500 dark:text-slate-400">Username</span>
+                  <span class="font-bold text-slate-900 dark:text-white font-mono" id="profile-username">-</span>
+                </div>
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
+                  <span class="text-slate-500 dark:text-slate-400">Role & Access</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800" id="profile-role">Administrator</span>
+                </div>
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
+                  <span class="text-slate-500 dark:text-slate-400">Account Created</span>
+                  <span class="font-mono text-slate-700 dark:text-slate-300" id="profile-created">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section C: Appearance Settings -->
+            <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <div class="flex items-center space-x-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-600">
+                  <i data-lucide="palette" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">Theme & Appearance</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Switch between Light and Dark visual modes</p>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                <div>
+                  <div class="text-xs font-bold text-slate-900 dark:text-white">System Theme</div>
+                  <div class="text-[11px] text-slate-500 dark:text-slate-400" id="current-theme-label">Active: Light Mode (Green/White)</div>
+                </div>
+
+                <div class="flex items-center space-x-1.5 bg-white dark:bg-slate-700 p-1 rounded-xl border border-slate-200 dark:border-slate-600">
+                  <button type="button" onclick="setAppTheme('light')" id="btn-theme-light" class="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 transition">
+                    <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+                    <span>Light</span>
+                  </button>
+                  <button type="button" onclick="setAppTheme('dark')" id="btn-theme-dark" class="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">
+                    <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+                    <span>Dark</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section D: Danger Zone (Account Deletion) -->
+            <div class="p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900 shadow-xs space-y-4">
+              <div class="flex items-center space-x-2.5 pb-3 border-b border-rose-100 dark:border-rose-900/50">
+                <div class="p-2 rounded-lg bg-rose-100 dark:bg-rose-900 text-rose-600 dark:text-rose-300">
+                  <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-rose-800 dark:text-rose-300">Danger Zone</h3>
+                  <p class="text-xs text-rose-600 dark:text-rose-400">Irreversible account actions</p>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Permanently delete your user credentials and custom store settings. Requires your password confirmation.
+                </p>
+
+                <button type="button" onclick="openDeleteAccountModal()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs transition shadow-sm shadow-rose-600/30 flex items-center space-x-2">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  <span>Delete My Account</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </section>
 
@@ -400,80 +604,157 @@
   <!-- MODALS -->
   <!-- ===================================================================== -->
 
-  <!-- 1. ADD ITEM MODAL -->
-  <div id="addModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div>
-          <h3 class="text-base font-bold text-slate-900">Add Verified Inventory Item</h3>
-          <p class="text-xs text-slate-500">Poka-Yoke validation rules active</p>
+  <!-- 1. COMPREHENSIVE ITEM DETAIL DRAWER / MODAL -->
+  <div id="itemDetailModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-5 shadow-2xl">
+      
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center space-x-3">
+          <span id="detail-sku" class="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950 font-mono font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-xs">SKU-000</span>
+          <h3 id="detail-name" class="text-base font-bold text-slate-900 dark:text-white">Item Details</h3>
         </div>
-        <button onclick="closeModal('addModal')" class="text-slate-400 hover:text-slate-600">
+        <button onclick="closeModal('itemDetailModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Detail Grid -->
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+          <span class="text-slate-400 text-[11px]">Category</span>
+          <div id="detail-category" class="font-bold text-slate-800 dark:text-white mt-0.5">-</div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+          <span class="text-slate-400 text-[11px]">Health Status</span>
+          <div id="detail-health" class="mt-0.5">-</div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+          <span class="text-slate-400 text-[11px]">Current Stock</span>
+          <div id="detail-qty" class="text-lg font-bold font-mono text-slate-900 dark:text-white mt-0.5">0</div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+          <span class="text-slate-400 text-[11px]">Unit Price</span>
+          <div id="detail-price" class="text-lg font-bold font-mono text-slate-900 dark:text-white mt-0.5">₹ 0.00</div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+          <span class="text-slate-400 text-[11px]">Total Asset Value</span>
+          <div id="detail-total-value" class="font-bold font-mono text-purple-700 dark:text-purple-400 mt-0.5">₹ 0.00</div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+          <span class="text-slate-400 text-[11px]">Reorder Threshold</span>
+          <div id="detail-reorder" class="font-bold font-mono text-slate-800 dark:text-white mt-0.5">5 units</div>
+        </div>
+      </div>
+
+      <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between text-xs">
+        <span class="text-slate-400">Created / Audit Timestamp:</span>
+        <span id="detail-created" class="font-mono text-slate-600 dark:text-slate-300">-</span>
+      </div>
+
+      <!-- Quick Steppers in Detail Drawer -->
+      <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">Quick Adjust Stock:</span>
+        <div class="flex items-center space-x-1.5">
+          <button onclick="adjustDetailStock(-5)" class="px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-xs font-bold">-5</button>
+          <button onclick="adjustDetailStock(-1)" class="px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-xs font-bold">-1</button>
+          <button onclick="adjustDetailStock(1)" class="px-2.5 py-1 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 text-xs font-bold">+1</button>
+          <button onclick="adjustDetailStock(5)" class="px-2.5 py-1 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 text-xs font-bold">+5</button>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+        <div class="flex items-center space-x-2">
+          <button onclick="editFromDetailDrawer()" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition flex items-center space-x-1.5">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            <span>Edit Item</span>
+          </button>
+          <button onclick="deleteFromDetailDrawer()" class="px-3.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 text-xs font-semibold transition flex items-center space-x-1.5">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Delete</span>
+          </button>
+        </div>
+        <button onclick="closeModal('itemDetailModal')" class="px-4 py-1.5 rounded-lg bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ADD ITEM MODAL -->
+  <div id="addModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Add Verified Inventory Item</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Poka-Yoke validation rules active</p>
+        </div>
+        <button onclick="closeModal('addModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <form onsubmit="handleAddItem(event)" class="space-y-3">
-        <!-- SKU -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">SKU Code (Pattern: SKU-XXXX):</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">SKU Code (Pattern: SKU-XXXX):</label>
           <input type="text" id="add-sku" oninput="checkSkuLive()" placeholder="e.g. SKU-101 or SKU-PRO88" required 
-            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
           <div id="sku-feedback" class="text-[10px] text-slate-400 mt-1 font-mono">Format: 'SKU-XXXX' (3-8 alphanumeric)</div>
         </div>
 
-        <!-- Name -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Item Name (min 2 chars):</label>
-          <input type="text" id="add-name" placeholder="e.g. Mechanical RGB Keyboard" required 
-            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Item Name (min 2 chars):</label>
+          <input type="text" id="add-name" placeholder="e.g. Wireless Ergonomic Mouse" required 
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
         </div>
 
-        <!-- Category -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Category:</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Category:</label>
           <input type="text" id="add-cat" placeholder="e.g. Peripherals, Display, Electronics" required 
-            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
         </div>
 
-        <!-- Qty & Price -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Quantity (≥ 0):</label>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Quantity (≥ 0):</label>
             <input type="number" id="add-qty" min="0" placeholder="25" required 
-              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Unit Price ₹ (> 0):</label>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Unit Price ₹ (> 0):</label>
             <input type="number" step="0.01" min="0.01" id="add-price" placeholder="1499.00" required 
-              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
           </div>
         </div>
 
-        <!-- Reorder Level -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Reorder Alert Level:</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Reorder Alert Level:</label>
           <input type="number" id="add-reorder" min="0" value="5" 
-            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
         </div>
 
         <div class="pt-2 flex items-center justify-end space-x-2">
-          <button type="button" onclick="closeModal('addModal')" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium">Cancel</button>
+          <button type="button" onclick="closeModal('addModal')" class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium">Cancel</button>
           <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-emerald-600/30">Verify & Add Item</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- 2. EDIT ITEM MODAL -->
+  <!-- 3. EDIT ITEM MODAL -->
   <div id="editModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
         <div>
-          <h3 class="text-base font-bold text-slate-900">Edit Item Details</h3>
-          <p id="edit-sku-badge" class="text-xs text-emerald-600 font-mono font-semibold"></p>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Edit Item Details</h3>
+          <p id="edit-sku-badge" class="text-xs text-emerald-600 dark:text-emerald-400 font-mono font-semibold"></p>
         </div>
-        <button onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-600">
+        <button onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -481,31 +762,63 @@
       <form onsubmit="handleEditItem(event)" class="space-y-3">
         <input type="hidden" id="edit-sku">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Item Name:</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Item Name:</label>
           <input type="text" id="edit-name" required 
-            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Category:</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Category:</label>
           <input type="text" id="edit-cat" required 
-            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Unit Price ₹ (> 0):</label>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Unit Price ₹ (> 0):</label>
             <input type="number" step="0.01" min="0.01" id="edit-price" required 
-              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Reorder Level:</label>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Reorder Level:</label>
             <input type="number" min="0" id="edit-reorder" required 
-              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
           </div>
         </div>
 
         <div class="pt-2 flex items-center justify-end space-x-2">
-          <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium">Cancel</button>
+          <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium">Cancel</button>
           <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-emerald-600/30">Save Updates</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. DELETE ACCOUNT CONFIRMATION MODAL -->
+  <div id="deleteAccountModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center space-x-3 text-rose-600 dark:text-rose-400">
+        <div class="p-2.5 rounded-xl bg-rose-100 dark:bg-rose-950/60">
+          <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Delete Account Permanently</h3>
+          <p class="text-xs text-slate-500">This action is irreversible</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-600 dark:text-slate-400">
+        Please enter your account password to confirm deletion of user <span class="font-bold text-slate-800 dark:text-white font-mono" id="delete-username-label"></span>.
+      </p>
+
+      <form onsubmit="handleConfirmDeleteAccount(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Confirm Password</label>
+          <input type="password" id="delete-confirm-password" placeholder="Enter password to confirm" required
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-rose-500">
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-1">
+          <button type="button" onclick="closeModal('deleteAccountModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-sm shadow-rose-600/30">Permanently Delete</button>
         </div>
       </form>
     </div>
@@ -515,23 +828,83 @@
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
   <!-- ===================================================================== -->
-  <!-- APPLICATION LOGIC & DATA SYNCHRONIZATION -->
+  <!-- APPLICATION LOGIC -->
   <!-- ===================================================================== -->
   <script>
     let inventoryData = [];
     let bugsData = [];
     let activeStockStatusFilter = 'ALL';
     let currentUser = null;
+    let selectedDetailItem = null;
 
     document.addEventListener("DOMContentLoaded", () => {
       lucide.createIcons();
+      initTheme();
       checkAuthSession();
     });
 
     // =========================================================================
-    // AUTHENTICATION SYSTEM
+    // THEME SWITCHER (LIGHT vs DARK)
     // =========================================================================
-    function checkAuthSession() {
+    function initTheme() {
+      const savedTheme = localStorage.getItem('app_theme') || 'light';
+      setAppTheme(savedTheme, false);
+    }
+
+    function setAppTheme(theme, save = true) {
+      const isDark = theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+
+      const lightBtn = document.getElementById('btn-theme-light');
+      const darkBtn = document.getElementById('btn-theme-dark');
+      const label = document.getElementById('current-theme-label');
+
+      if (lightBtn && darkBtn) {
+        if (isDark) {
+          darkBtn.className = 'flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800 transition';
+          lightBtn.className = 'flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition';
+          if (label) label.textContent = 'Active: Dark Mode';
+        } else {
+          lightBtn.className = 'flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 transition';
+          darkBtn.className = 'flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+          if (label) label.textContent = 'Active: Light Mode (Green/White)';
+        }
+      }
+
+      if (save) {
+        localStorage.setItem('app_theme', theme);
+        showToast(`Switched to ${isDark ? 'Dark' : 'Light'} Mode`, 'info');
+      }
+    }
+
+    // =========================================================================
+    // AUTHENTICATION SYSTEM (LOGIN & SIGN UP)
+    // =========================================================================
+    function setAuthTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('form-login').classList.toggle('hidden', !isLogin);
+      document.getElementById('form-register').classList.toggle('hidden', isLogin);
+
+      document.getElementById('tab-auth-login').className = isLogin 
+        ? 'flex-1 py-2 rounded-lg bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs transition'
+        : 'flex-1 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
+
+      document.getElementById('tab-auth-register').className = !isLogin 
+        ? 'flex-1 py-2 rounded-lg bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs transition'
+        : 'flex-1 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
+    }
+
+    async function checkAuthSession() {
+      try {
+        const res = await fetch('/api/auth/session');
+        const data = await res.json();
+        if (data.authenticated && data.user) {
+          currentUser = data.user;
+          renderAuthenticatedApp();
+          return;
+        }
+      } catch (e) {}
+
       const stored = localStorage.getItem('aeroflow_session');
       if (stored) {
         try {
@@ -550,11 +923,6 @@
       const username = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value.trim();
 
-      if (!username) {
-        showToast('Please enter a username', 'error');
-        return;
-      }
-
       try {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
@@ -564,25 +932,43 @@
         const data = await res.json();
         if (data.success) {
           currentUser = data.user;
-          if (document.getElementById('remember-me').checked) {
+          if (document.getElementById('login-remember').checked) {
             localStorage.setItem('aeroflow_session', JSON.stringify(currentUser));
           }
           renderAuthenticatedApp();
-          showToast(`Welcome back, ${currentUser.displayName}!`, 'success');
+          showToast(`Welcome back, ${currentUser.username}!`, 'success');
         } else {
-          showToast(data.message || 'Login failed', 'error');
+          showToast(data.message || 'Invalid username or password', 'error');
         }
       } catch (err) {
-        // Fallback for local desktop offline run
-        const displayName = (username.toLowerCase().includes('lokesh') || username.toLowerCase() === 'admin') 
-          ? 'Lokesh Maurya' 
-          : username;
-        currentUser = {username, displayName, role: 'Administrator'};
-        if (document.getElementById('remember-me').checked) {
+        showToast('Login connection error', 'error');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value.trim();
+      const store_name = document.getElementById('reg-store-name').value.trim();
+      const store_owner_name = document.getElementById('reg-owner-name').value.trim();
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({username, password, store_name, store_owner_name})
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
           localStorage.setItem('aeroflow_session', JSON.stringify(currentUser));
+          renderAuthenticatedApp();
+          showToast(data.message, 'success');
+        } else {
+          showToast(data.message || 'Registration failed', 'error');
         }
-        renderAuthenticatedApp();
-        showToast(`Welcome back, ${currentUser.displayName}!`, 'success');
+      } catch (err) {
+        showToast('Registration error', 'error');
       }
     }
 
@@ -600,12 +986,25 @@
     function renderAuthenticatedApp() {
       document.getElementById('login-view').classList.add('hidden');
       document.getElementById('app-shell').classList.remove('hidden');
-      
+
+      // Update Header User Greeting
       const greetingEl = document.getElementById('user-greeting-text');
-      if (greetingEl) {
-        greetingEl.textContent = `Hello, ${currentUser.displayName || 'Lokesh Maurya'}`;
+      if (greetingEl && currentUser) {
+        greetingEl.textContent = `Hello, ${currentUser.store_owner_name || currentUser.username}`;
       }
-      
+
+      // Update Dynamic Store Header Badge & Setup Banner
+      updateStoreHeader();
+
+      // Populate Settings Inputs
+      if (currentUser) {
+        document.getElementById('settings-store-name').value = currentUser.store_name || '';
+        document.getElementById('settings-owner-name').value = currentUser.store_owner_name || '';
+        document.getElementById('profile-username').textContent = currentUser.username || '-';
+        document.getElementById('profile-role').textContent = currentUser.role || 'Administrator';
+        document.getElementById('profile-created').textContent = currentUser.created_at || 'Active Session';
+      }
+
       lucide.createIcons();
       refreshAll();
     }
@@ -613,7 +1012,113 @@
     function renderLoginScreen() {
       document.getElementById('app-shell').classList.add('hidden');
       document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      setAuthTab('login');
       lucide.createIcons();
+    }
+
+    // =========================================================================
+    // STORE NAME CONFIGURATION
+    // =========================================================================
+    function updateStoreHeader() {
+      const container = document.getElementById('header-store-badge-container');
+      const banner = document.getElementById('store-setup-banner');
+
+      if (!container) return;
+
+      const storeName = (currentUser && currentUser.store_name) ? currentUser.store_name.trim() : '';
+
+      if (storeName) {
+        container.innerHTML = `
+          <button onclick="switchView('settings')" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 transition" title="Click to edit Store Settings">
+            <i data-lucide="store" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span>${storeName}</span>
+          </button>
+        `;
+        if (banner) banner.classList.add('hidden');
+      } else {
+        container.innerHTML = `
+          <button onclick="switchView('settings')" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 border border-amber-200 dark:border-amber-800 text-xs font-semibold text-amber-800 dark:text-amber-300 transition" title="Configure your Store Name">
+            <i data-lucide="store" class="w-3.5 h-3.5 text-amber-600"></i>
+            <span>Set Your Store Name</span>
+            <i data-lucide="chevron-right" class="w-3 h-3 text-amber-600"></i>
+          </button>
+        `;
+        if (banner) banner.classList.remove('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    async function handleSaveStoreSettings(e) {
+      e.preventDefault();
+      const store_name = document.getElementById('settings-store-name').value.trim();
+      const store_owner_name = document.getElementById('settings-owner-name').value.trim();
+
+      try {
+        const res = await fetch('/api/settings/store', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({store_name, store_owner_name})
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
+          localStorage.setItem('aeroflow_session', JSON.stringify(currentUser));
+          updateStoreHeader();
+          
+          const greetingEl = document.getElementById('user-greeting-text');
+          if (greetingEl) {
+            greetingEl.textContent = `Hello, ${currentUser.store_owner_name || currentUser.username}`;
+          }
+
+          showToast('Store settings saved successfully!', 'success');
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Failed to save store settings', 'error');
+      }
+    }
+
+    // =========================================================================
+    // DANGER ZONE (ACCOUNT DELETION)
+    // =========================================================================
+    function openDeleteAccountModal() {
+      if (!currentUser) return;
+      document.getElementById('delete-username-label').textContent = currentUser.username;
+      document.getElementById('delete-confirm-password').value = '';
+      openModal('deleteAccountModal');
+    }
+
+    async function handleConfirmDeleteAccount(e) {
+      e.preventDefault();
+      const password = document.getElementById('delete-confirm-password').value.trim();
+
+      if (!password) {
+        showToast('Password is required', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/delete-account', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({password})
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('deleteAccountModal');
+          currentUser = null;
+          localStorage.removeItem('aeroflow_session');
+          renderLoginScreen();
+          showToast('Account permanently deleted.', 'info');
+        } else {
+          showToast(data.message || 'Deletion failed', 'error');
+        }
+      } catch (err) {
+        showToast('Error during account deletion', 'error');
+      }
     }
 
     // =========================================================================
@@ -645,8 +1150,8 @@
           const lowEl = document.getElementById('kpi-low');
           lowEl.textContent = data.inventory.low_stock_count;
           lowEl.className = data.inventory.low_stock_count > 0 
-            ? 'text-2xl font-bold font-mono text-amber-600 my-1' 
-            : 'text-2xl font-bold font-mono text-emerald-600 my-1';
+            ? 'text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 my-1' 
+            : 'text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 my-1';
 
           document.getElementById('kpi-bugs').textContent = data.bugs.total_bugs;
           document.getElementById('badge-sku-count').textContent = data.inventory.total_skus;
@@ -658,7 +1163,7 @@
     }
 
     // =========================================================================
-    // INVENTORY WORKSPACE
+    // INVENTORY WORKSPACE & CLICKABLE ROWS
     // =========================================================================
     async function loadInventory() {
       try {
@@ -693,9 +1198,9 @@
       ['all', 'low', 'healthy', 'out'].forEach(s => {
         const btn = document.getElementById(`pill-${s}`);
         if (s.toUpperCase() === status) {
-          btn.className = 'px-2.5 py-1 rounded font-medium bg-white text-emerald-700 shadow-xs transition';
+          btn.className = 'px-2.5 py-1 rounded font-medium bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs transition';
         } else {
-          btn.className = 'px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition';
+          btn.className = 'px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
         }
       });
       filterInventoryTable();
@@ -725,37 +1230,90 @@
 
       filtered.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50/80 transition group';
+        // Entire row is clickable, opens comprehensive Detail Drawer / Modal
+        tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/60 transition cursor-pointer group';
+        tr.onclick = () => openItemDetailDrawer(item.sku);
 
         const statusBadge = item.badge === 'danger' 
-          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Out of Stock</span>`
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900">Out of Stock</span>`
           : (item.badge === 'warning'
-            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Low Stock</span>`
-            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Healthy</span>`);
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900">Low Stock</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">Healthy</span>`);
 
         tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold text-emerald-700">${item.sku}</td>
-          <td class="py-3 px-4 font-semibold text-slate-800">${item.name}</td>
-          <td class="py-3 px-4 text-slate-500">${item.category}</td>
-          <td class="py-3 px-4 text-center font-mono font-bold ${item.quantity <= item.reorder_level ? 'text-amber-600' : 'text-slate-700'}">${item.quantity}</td>
-          <td class="py-3 px-4 text-right font-mono text-slate-600">₹ ${item.unit_price.toFixed(2)}</td>
-          <td class="py-3 px-4 text-right font-mono text-slate-900 font-semibold">₹ ${item.total_value.toFixed(2)}</td>
-          <td class="py-3 px-4 text-center font-mono text-slate-500">${item.reorder_level}</td>
+          <td class="py-3 px-4 font-mono font-bold text-emerald-700 dark:text-emerald-400">${item.sku}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800 dark:text-white">${item.name}</td>
+          <td class="py-3 px-4 text-slate-500 dark:text-slate-400">${item.category}</td>
+          <td class="py-3 px-4 text-center font-mono font-bold ${item.quantity <= item.reorder_level ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}">${item.quantity}</td>
+          <td class="py-3 px-4 text-right font-mono text-slate-600 dark:text-slate-400">₹ ${item.unit_price.toFixed(2)}</td>
+          <td class="py-3 px-4 text-right font-mono text-slate-900 dark:text-white font-semibold">₹ ${item.total_value.toFixed(2)}</td>
+          <td class="py-3 px-4 text-center font-mono text-slate-500 dark:text-slate-400">${item.reorder_level}</td>
           <td class="py-3 px-4 text-center">${statusBadge}</td>
-          <td class="py-3 px-4">
+          <td class="py-3 px-4" onclick="event.stopPropagation()">
             <div class="flex items-center justify-center space-x-1.5">
-              <button onclick="adjustStock('${item.sku}', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold transition" title="Stock Out -1">-1</button>
-              <button onclick="adjustStock('${item.sku}', 1)" class="w-6 h-6 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold transition" title="Stock In +1">+1</button>
-              <button onclick="adjustStock('${item.sku}', 5)" class="w-6 h-6 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold transition" title="Stock In +5">+5</button>
-              <span class="text-slate-300">|</span>
-              <button onclick="openEditModal('${item.sku}')" class="p-1 rounded hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition" title="Edit Item Details"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
-              <button onclick="deleteItem('${item.sku}')" class="p-1 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition" title="Delete Item"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', -1)" class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 flex items-center justify-center text-xs font-bold transition" title="Stock Out -1">-1</button>
+              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 1)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition" title="Stock In +1">+1</button>
+              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 5)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition" title="Stock In +5">+5</button>
+              <span class="text-slate-300 dark:text-slate-700">|</span>
+              <button onclick="event.stopPropagation(); openEditModal('${item.sku}')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition" title="Edit Item Details"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+              <button onclick="event.stopPropagation(); deleteItem('${item.sku}')" class="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950 text-slate-400 hover:text-rose-600 transition" title="Delete Item"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </td>
         `;
         tbody.appendChild(tr);
       });
       lucide.createIcons();
+    }
+
+    // =========================================================================
+    // ITEM DETAIL DRAWER (COMPREHENSIVE VIEW)
+    // =========================================================================
+    function openItemDetailDrawer(sku) {
+      const item = inventoryData.find(i => i.sku === sku);
+      if (!item) return;
+
+      selectedDetailItem = item;
+      document.getElementById('detail-sku').textContent = item.sku;
+      document.getElementById('detail-name').textContent = item.name;
+      document.getElementById('detail-category').textContent = item.category;
+      document.getElementById('detail-qty').textContent = item.quantity;
+      document.getElementById('detail-price').textContent = `₹ ${item.unit_price.toFixed(2)}`;
+      document.getElementById('detail-total-value').textContent = `₹ ${item.total_value.toFixed(2)}`;
+      document.getElementById('detail-reorder').textContent = `${item.reorder_level} units threshold`;
+      document.getElementById('detail-created').textContent = item.created_at || 'Database Record';
+
+      const healthEl = document.getElementById('detail-health');
+      if (item.badge === 'danger') {
+        healthEl.innerHTML = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">Critical: Out of Stock</span>`;
+      } else if (item.badge === 'warning') {
+        healthEl.innerHTML = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">Warning: Low Stock (≤ ${item.reorder_level})</span>`;
+      } else {
+        healthEl.innerHTML = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Optimal: In Stock</span>`;
+      }
+
+      openModal('itemDetailModal');
+    }
+
+    async function adjustDetailStock(delta) {
+      if (!selectedDetailItem) return;
+      await adjustStock(selectedDetailItem.sku, delta);
+      // Re-fetch item to update detail modal values
+      setTimeout(() => {
+        const updated = inventoryData.find(i => i.sku === selectedDetailItem.sku);
+        if (updated) openItemDetailDrawer(updated.sku);
+      }, 300);
+    }
+
+    function editFromDetailDrawer() {
+      if (!selectedDetailItem) return;
+      closeModal('itemDetailModal');
+      openEditModal(selectedDetailItem.sku);
+    }
+
+    function deleteFromDetailDrawer() {
+      if (!selectedDetailItem) return;
+      closeModal('itemDetailModal');
+      deleteItem(selectedDetailItem.sku);
     }
 
     async function adjustStock(sku, delta) {
@@ -795,7 +1353,7 @@
     }
 
     // =========================================================================
-    // MODAL FORM SUBMISSIONS
+    // ADD & EDIT MODALS
     // =========================================================================
     function checkSkuLive() {
       const v = document.getElementById('add-sku').value.trim();
@@ -891,7 +1449,7 @@
     }
 
     // =========================================================================
-    // DEFECT TRACKER (Q09) WORKSPACE
+    // DEFECT TRACKER WORKSPACE
     // =========================================================================
     async function loadBugs() {
       try {
@@ -929,33 +1487,33 @@
 
       filtered.forEach(b => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50/80 transition';
+        tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/60 transition';
 
         const sevBadge = b.severity >= 4
-          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">🔥 Sev ${b.severity}</span>`
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900">🔥 Sev ${b.severity}</span>`
           : (b.severity === 3
-            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">⚠️ Sev ${b.severity}</span>`
-            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">⚡ Sev ${b.severity}</span>`);
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900">⚠️ Sev ${b.severity}</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900">⚡ Sev ${b.severity}</span>`);
 
         const statusBadge = b.status === 'Resolved'
-          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Resolved ✅</span>`
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">Resolved ✅</span>`
           : (b.status === 'In-Progress'
-            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">In-Progress 🛠️</span>`
-            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Open ⏳</span>`);
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">In-Progress 🛠️</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">Open ⏳</span>`);
 
         tr.innerHTML = `
           <td class="py-3 px-4 text-center font-mono text-slate-500">#${b.id}</td>
           <td class="py-3 px-4 font-mono text-[11px] text-slate-500">${b.logged_at}</td>
-          <td class="py-3 px-4 font-mono text-emerald-700 font-semibold">${b.module}</td>
-          <td class="py-3 px-4 font-semibold text-slate-800">${b.defect_type}</td>
+          <td class="py-3 px-4 font-mono text-emerald-700 dark:text-emerald-400 font-semibold">${b.module}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800 dark:text-white">${b.defect_type}</td>
           <td class="py-3 px-4 text-center">${sevBadge}</td>
           <td class="py-3 px-4 text-center">${statusBadge}</td>
-          <td class="py-3 px-4 text-slate-600 max-w-xs truncate" title="${b.description}">${b.description}</td>
+          <td class="py-3 px-4 text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${b.description}">${b.description}</td>
           <td class="py-3 px-4 text-center">
             <div class="flex items-center justify-center space-x-1">
-              ${b.status !== 'In-Progress' ? `<button onclick="updateBugStatus(${b.id}, 'In-Progress')" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 text-[10px] font-medium border border-blue-200" title="Mark In-Progress">In-Prog</button>` : ''}
-              ${b.status !== 'Resolved' ? `<button onclick="updateBugStatus(${b.id}, 'Resolved')" class="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-medium border border-emerald-200" title="Mark Resolved">Resolve</button>` : ''}
-              ${b.status === 'Resolved' ? `<button onclick="updateBugStatus(${b.id}, 'Open')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-medium border border-slate-200" title="Reopen">Reopen</button>` : ''}
+              ${b.status !== 'In-Progress' ? `<button onclick="updateBugStatus(${b.id}, 'In-Progress')" class="px-2 py-1 rounded bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 text-blue-700 dark:text-blue-300 text-[10px] font-medium border border-blue-200" title="Mark In-Progress">In-Prog</button>` : ''}
+              ${b.status !== 'Resolved' ? `<button onclick="updateBugStatus(${b.id}, 'Resolved')" class="px-2 py-1 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-[10px] font-medium border border-emerald-200" title="Mark Resolved">Resolve</button>` : ''}
+              ${b.status === 'Resolved' ? `<button onclick="updateBugStatus(${b.id}, 'Open')" class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-[10px] font-medium border border-slate-200" title="Reopen">Reopen</button>` : ''}
             </div>
           </td>
         `;
@@ -1040,17 +1598,17 @@
     // NAVIGATION SWITCHER
     // =========================================================================
     function switchView(viewName) {
-      ['inventory', 'bugs', 'logs'].forEach(v => {
+      ['inventory', 'bugs', 'logs', 'settings'].forEach(v => {
         const viewEl = document.getElementById(`view-${v}`);
         if (viewEl) viewEl.classList.add('hidden');
         const btn = document.getElementById(`nav-${v}`);
-        if (btn) btn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition group';
+        if (btn) btn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition group';
       });
 
       const activeView = document.getElementById(`view-${viewName}`);
       if (activeView) activeView.classList.remove('hidden');
       const activeBtn = document.getElementById(`nav-${viewName}`);
-      if (activeBtn) activeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 transition group';
+      if (activeBtn) activeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 transition group';
 
       if (viewName === 'logs') {
         loadLogs();

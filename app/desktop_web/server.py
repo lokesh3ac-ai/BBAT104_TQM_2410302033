@@ -25,12 +25,19 @@ from app.bug_tracker import (
     log_system_error
 )
 from app.database import get_connection
+from app.auth import (
+    register_user,
+    authenticate_user,
+    get_user_profile,
+    update_store_settings,
+    delete_user_account
+)
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-app.secret_key = "aeroflow-secret-session-key-2026"
+app.secret_key = "inventory-mgmt-system-secret-key-2026"
 
 # Disable verbose logging in production desktop mode
 import logging
@@ -42,37 +49,44 @@ def index():
     return render_template("index.html")
 
 # =============================================================================
-# AUTHENTICATION APIS
+# AUTHENTICATION & USER MANAGEMENT APIS
 # =============================================================================
+@app.route("/api/auth/register", methods=["POST"])
+def api_register():
+    data = request.json or {}
+    username = data.get("username", "")
+    password = data.get("password", "")
+    store_name = data.get("store_name", "")
+    store_owner_name = data.get("store_owner_name", "")
+
+    success, result = register_user(username, password, store_name, store_owner_name)
+    if not success:
+        return jsonify({"success": False, "message": result}), 400
+
+    # Auto-login upon registration
+    session["user"] = result
+    return jsonify({
+        "success": True,
+        "message": f"Welcome, {username}! Account registered successfully.",
+        "user": result
+    })
+
+
 @app.route("/api/auth/login", methods=["POST"])
 def api_login():
     data = request.json or {}
-    username = str(data.get("username", "")).strip()
-    password = str(data.get("password", "")).strip()
+    username = data.get("username", "")
+    password = data.get("password", "")
 
-    if not username:
-        return jsonify({"success": False, "message": "Please enter a valid username."}), 400
+    success, result = authenticate_user(username, password)
+    if not success:
+        return jsonify({"success": False, "message": result}), 401
 
-    if not password:
-        return jsonify({"success": False, "message": "Please enter your password."}), 400
-
-    # Determine display name
-    if username.lower() in ("lokesh", "lokesh maurya", "lokesh.maurya", "admin"):
-        display_name = "Lokesh Maurya"
-    else:
-        display_name = username.title()
-
-    session["user"] = {
-        "username": username,
-        "displayName": display_name,
-        "role": "Administrator",
-        "loginTime": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
-
+    session["user"] = result
     return jsonify({
         "success": True,
-        "message": f"Welcome back, {display_name}!",
-        "user": session["user"]
+        "message": f"Welcome back, {result['username']}!",
+        "user": result
     })
 
 
@@ -85,9 +99,50 @@ def api_logout():
 @app.route("/api/auth/session", methods=["GET"])
 def api_get_session():
     user = session.get("user")
-    if user:
-        return jsonify({"authenticated": True, "user": user})
+    if user and user.get("username"):
+        profile = get_user_profile(user["username"])
+        if profile:
+            session["user"] = profile
+            return jsonify({"authenticated": True, "user": profile})
     return jsonify({"authenticated": False, "user": None})
+
+
+@app.route("/api/settings/store", methods=["POST"])
+def api_update_store():
+    data = request.json or {}
+    user = session.get("user")
+    username = data.get("username") or (user.get("username") if user else None)
+    
+    if not username:
+        return jsonify({"success": False, "message": "User session not found."}), 401
+
+    store_name = data.get("store_name", "")
+    store_owner_name = data.get("store_owner_name", "")
+
+    success, msg = update_store_settings(username, store_name, store_owner_name)
+    if success:
+        profile = get_user_profile(username)
+        if profile:
+            session["user"] = profile
+        return jsonify({"success": True, "message": msg, "user": profile})
+    return jsonify({"success": False, "message": msg}), 400
+
+
+@app.route("/api/auth/delete-account", methods=["POST"])
+def api_delete_account():
+    data = request.json or {}
+    user = session.get("user")
+    username = data.get("username") or (user.get("username") if user else None)
+    password = data.get("password", "")
+
+    if not username:
+        return jsonify({"success": False, "message": "User session not found."}), 401
+
+    success, msg = delete_user_account(username, password)
+    if success:
+        session.pop("user", None)
+        return jsonify({"success": True, "message": msg})
+    return jsonify({"success": False, "message": msg}), 400
 
 
 # =============================================================================
@@ -180,7 +235,7 @@ def api_get_categories():
 
 
 # =============================================================================
-# BUG TRACKER (Q09) REST APIS
+# DEFECT TRACKER REST APIS
 # =============================================================================
 @app.route("/api/bugs", methods=["GET"])
 def api_get_bugs():
@@ -279,7 +334,7 @@ def api_export_csv():
     return Response(
         output.getvalue(),
         mimetype="text/csv",
-        headers={"Content-Disposition": f"attachment;filename=AERO_FLOW_Inventory_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"}
+        headers={"Content-Disposition": f"attachment;filename=Inventory_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"}
     )
 
 

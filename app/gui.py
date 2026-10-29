@@ -63,7 +63,7 @@ FONT_FAMILY = "Segoe UI"
 class InventoryApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("AERO-FLOW // Inventory & Quality Control Suite")
+        self.title("INVENTORY MANAGEMENT SYSTEM")
         self.geometry("1280x820")
         self.minsize(1120, 720)
         self.configure(fg_color=PALETTE["bg_light"])
@@ -138,8 +138,8 @@ class InventoryApp(ctk.CTk):
 
         lbl_logo = ctk.CTkLabel(
             brand_frame,
-            text="◈ AERO-FLOW",
-            font=ctk.CTkFont(family=FONT_FAMILY, size=20, weight="bold"),
+            text="◈ INVENTORY SYSTEM",
+            font=ctk.CTkFont(family=FONT_FAMILY, size=18, weight="bold"),
             text_color=PALETTE["text_primary"]
         )
         lbl_logo.pack(anchor="w")
@@ -159,7 +159,7 @@ class InventoryApp(ctk.CTk):
         self.nav_buttons = {}
         nav_items = [
             ("inventory", "📦  Inventory Master"),
-            ("bugs", "🛡️  Defect Tracker (Q09)"),
+            ("bugs", "🛡️  Defect Tracker"),
             ("logs", "🖥️  Live System Logs"),
         ]
 
@@ -307,12 +307,12 @@ class InventoryApp(ctk.CTk):
         btn_logout.pack(side="left", padx=4)
 
     def handle_logout(self):
-        if messagebox.askyesno("Sign Out", "Are you sure you want to sign out of AERO-FLOW?"):
+        if messagebox.askyesno("Sign Out", "Are you sure you want to sign out of Inventory Management System?"):
             self.open_login_modal()
 
     def open_login_modal(self):
         modal = ctk.CTkToplevel(self)
-        modal.title("AERO-FLOW // Sign In")
+        modal.title("INVENTORY MANAGEMENT SYSTEM // Sign In")
         modal.geometry("380x360")
         modal.resizable(False, False)
         modal.configure(fg_color=PALETTE["bg_light"])
@@ -321,7 +321,7 @@ class InventoryApp(ctk.CTk):
 
         ctk.CTkLabel(
             modal,
-            text="◈ AERO-FLOW",
+            text="◈ INVENTORY SYSTEM",
             font=ctk.CTkFont(family=FONT_FAMILY, size=18, weight="bold"),
             text_color=PALETTE["text_primary"]
         ).pack(pady=(24, 2))
@@ -377,7 +377,7 @@ class InventoryApp(ctk.CTk):
         self.card_units = self.create_metric_card(kpi_bar, "TOTAL STOCK", "0", "Warehouse Units", PALETTE["accent_blue"])
         self.card_valuation = self.create_metric_card(kpi_bar, "VALUATION", "₹ 0.00", "Asset Value", PALETTE["accent_purple"])
         self.card_low_stock = self.create_metric_card(kpi_bar, "LOW STOCK ALERTS", "0", "≤ Reorder Limit", PALETTE["warning"])
-        self.card_trapped_bugs = self.create_metric_card(kpi_bar, "TRAPPED BUGS", "0", "Q09 Interceptions", PALETTE["danger"])
+        self.card_trapped_bugs = self.create_metric_card(kpi_bar, "TRAPPED BUGS", "0", "Quality Interceptions", PALETTE["danger"])
 
     def create_metric_card(self, parent, title, value, subtitle, accent_color):
         card = ctk.CTkFrame(
@@ -444,7 +444,7 @@ class InventoryApp(ctk.CTk):
 
         titles = {
             "inventory": "Inventory Master",
-            "bugs": "Defect Tracker (Q09)",
+            "bugs": "Defect Tracker",
             "logs": "Live System Logs"
         }
         self.lbl_view_title.configure(text=titles.get(view_key, "Workspace"))
@@ -618,7 +618,7 @@ class InventoryApp(ctk.CTk):
         return view
 
     # =========================================================================
-    # VIEW 2: DEFECT TRACKER (Q09)
+    # VIEW 2: DEFECT TRACKER
     # =========================================================================
     def create_bug_tracker_view(self):
         view = ctk.CTkFrame(self.view_container, fg_color="transparent")

@@ -67,8 +67,7 @@ def main():
     url = f"http://127.0.0.1:{port}"
 
     print("=" * 65)
-    print("  ◈ AERO-FLOW // TQM Q09 Defect-Proof Desktop Suite")
-    print("  Student: Lokesh Maurya | Roll: 2410302033 | CSE-B")
+    print("  ◈ INVENTORY MANAGEMENT SYSTEM")
     print(f"  Starting local desktop application server at {url}...")
     print("=" * 65)
 

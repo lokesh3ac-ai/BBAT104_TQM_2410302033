@@ -10,7 +10,7 @@ def get_connection():
     return conn
 
 def init_db():
-    """Initializes tables for Inventory and Q09 Bug Tracking."""
+    """Initializes tables for Inventory, Defect Tracking, and Users."""
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -28,7 +28,7 @@ def init_db():
     );
     """)
 
-    # 2. Q09 In-App Bug Tracker Table
+    # 2. Defect Tracker Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS bug_reports (
         bug_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,6 +38,19 @@ def init_db():
         description TEXT NOT NULL,
         status TEXT DEFAULT 'Open' CHECK(status IN ('Open', 'In-Progress', 'Resolved')),
         logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # 3. Users Table (Authentication & Store Settings)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL COLLATE NOCASE,
+        password_hash TEXT NOT NULL,
+        store_name TEXT DEFAULT '',
+        store_owner_name TEXT DEFAULT '',
+        role TEXT DEFAULT 'Administrator',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
 
