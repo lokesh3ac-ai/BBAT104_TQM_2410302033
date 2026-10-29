@@ -3,7 +3,7 @@ import io
 import csv
 import json
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, Response, send_file
+from flask import Flask, render_template, request, jsonify, Response, send_file, session
 
 from app.inventory_logic import (
     add_item,
@@ -30,6 +30,7 @@ TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+app.secret_key = "aeroflow-secret-session-key-2026"
 
 # Disable verbose logging in production desktop mode
 import logging
@@ -39,6 +40,55 @@ log.setLevel(logging.ERROR)
 @app.route("/")
 def index():
     return render_template("index.html")
+
+# =============================================================================
+# AUTHENTICATION APIS
+# =============================================================================
+@app.route("/api/auth/login", methods=["POST"])
+def api_login():
+    data = request.json or {}
+    username = str(data.get("username", "")).strip()
+    password = str(data.get("password", "")).strip()
+
+    if not username:
+        return jsonify({"success": False, "message": "Please enter a valid username."}), 400
+
+    if not password:
+        return jsonify({"success": False, "message": "Please enter your password."}), 400
+
+    # Determine display name
+    if username.lower() in ("lokesh", "lokesh maurya", "lokesh.maurya", "admin"):
+        display_name = "Lokesh Maurya"
+    else:
+        display_name = username.title()
+
+    session["user"] = {
+        "username": username,
+        "displayName": display_name,
+        "role": "Administrator",
+        "loginTime": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    return jsonify({
+        "success": True,
+        "message": f"Welcome back, {display_name}!",
+        "user": session["user"]
+    })
+
+
+@app.route("/api/auth/logout", methods=["POST"])
+def api_logout():
+    session.pop("user", None)
+    return jsonify({"success": True, "message": "Logged out successfully."})
+
+
+@app.route("/api/auth/session", methods=["GET"])
+def api_get_session():
+    user = session.get("user")
+    if user:
+        return jsonify({"authenticated": True, "user": user})
+    return jsonify({"authenticated": False, "user": None})
+
 
 # =============================================================================
 # INVENTORY REST APIS
@@ -175,34 +225,8 @@ def api_clear_resolved_bugs():
     return jsonify({"success": success, "message": msg}), (200 if success else 400)
 
 
-@app.route("/api/bugs/simulate", methods=["POST"])
-def api_simulate_defect():
-    """Triggers an intentional Poka-Yoke error to demonstrate live trapping."""
-    data = request.json or {}
-    sim_type = data.get("type", "negative_qty")
-    
-    if sim_type == "malformed_sku":
-        success, msg = add_item("INVALID_CODE_XYZ!", "Bad Item", "Electronics", "10", "100.0")
-    elif sim_type == "negative_price":
-        success, msg = add_item("SKU-SIM01", "Faulty Component", "Hardware", "5", "-450.0")
-    elif sim_type == "underflow_stock":
-        # Deduct massive amount on existing item
-        items = get_all_items()
-        target_sku = items[0][1] if items else "SKU-TEST01"
-        success, msg = update_stock(target_sku, -99999)
-    else: # negative_qty
-        success, msg = add_item("SKU-SIM02", "Underflow Test", "Sensors", "-25", "500.0")
-
-    return jsonify({
-        "success": False, # intentionally rejected
-        "poka_yoke_trapped": True,
-        "message": msg,
-        "explanation": "Poka-Yoke layer successfully blocked invalid data from hitting the database."
-    })
-
-
 # =============================================================================
-# STATS & SQC APIS
+# STATS APIS
 # =============================================================================
 @app.route("/api/stats", methods=["GET"])
 def api_get_stats():
@@ -214,40 +238,6 @@ def api_get_stats():
         "bugs": bug_stats,
         "interception_rate": "100%",
         "rpn_reduction": "93.1%"
-    })
-
-
-@app.route("/api/sqc/pareto", methods=["GET"])
-def api_get_pareto_data():
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute("SELECT defect_type, COUNT(*) FROM bug_reports GROUP BY defect_type")
-    dynamic_counts = dict(c.fetchall())
-    conn.close()
-
-    baseline = [
-        {"category": "Input Format / Type Mismatch", "count": 48 + dynamic_counts.get("ValidationFailure", 0)},
-        {"category": "Negative Stock Level Violation", "count": 32 + dynamic_counts.get("NegativeStockAttempt", 0) + dynamic_counts.get("NegativeStockViolation", 0)},
-        {"category": "Duplicate SKU Constraint", "count": 14 + dynamic_counts.get("DuplicateSKU", 0) + dynamic_counts.get("DuplicateSKUAttempt", 0)},
-        {"category": "Malformed SKU Syntax", "count": 8 + dynamic_counts.get("MalformedSKUSyntax", 0)},
-        {"category": "Zero / Negative Price Boundary", "count": 4 + dynamic_counts.get("NonPositivePrice", 0)},
-        {"category": "Unhandled SQLite Lock", "count": 2 + dynamic_counts.get("DatabaseError", 0)}
-    ]
-    # Sort descending
-    baseline.sort(key=lambda x: x["count"], reverse=True)
-    total = sum(x["count"] for x in baseline) or 1
-    
-    cumulative = 0
-    for item in baseline:
-        cumulative += item["count"]
-        item["cumulative_pct"] = round((cumulative / total) * 100, 1)
-
-    return jsonify({
-        "success": True,
-        "categories": [x["category"] for x in baseline],
-        "counts": [x["count"] for x in baseline],
-        "cumulative_percentages": [x["cumulative_pct"] for x in baseline],
-        "total_defects": total
     })
 
 

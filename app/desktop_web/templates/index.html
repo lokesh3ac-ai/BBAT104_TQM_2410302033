@@ -1,28 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AERO-FLOW // TQM Q09 Zero-Defect Desktop Suite</title>
+  <title>AERO-FLOW // Inventory & Quality Management Suite</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
             brand: {
-              cyan: '#00f0ff',
-              blue: '#3b82f6',
-              indigo: '#6366f1',
-              dark: '#070a13',
-              card: '#0f172a',
-              cardBorder: '#1e293b'
+              emerald: '#10b981',
+              emeraldDark: '#059669',
+              emeraldLight: '#ecfdf5',
+              surface: '#f8fafc',
+              border: '#e2e8f0',
+              textPrimary: '#0f172a',
+              textSecondary: '#334155',
+              textMuted: '#64748b'
             }
           },
           fontFamily: {
@@ -36,667 +35,380 @@
   <style>
     /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #070a13; }
-    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #334155; }
-    
-    /* Subtle Glow Effects */
-    .glow-cyan { box-shadow: 0 0 20px -5px rgba(0, 240, 255, 0.3); }
-    .glow-blue { box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.3); }
-    .glow-red { box-shadow: 0 0 20px -5px rgba(239, 68, 68, 0.3); }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
-<body class="bg-[#070a13] text-slate-100 font-sans antialiased h-screen overflow-hidden flex flex-col select-none">
+<body class="bg-white text-slate-800 font-sans antialiased h-screen overflow-hidden flex flex-col select-none">
 
   <!-- ===================================================================== -->
-  <!-- TOP APPLICATION BAR -->
+  <!-- 1. AUTHENTICATION VIEW (LOGIN SCREEN) -->
   <!-- ===================================================================== -->
-  <header class="h-16 bg-[#0c1222]/80 backdrop-blur-md border-b border-slate-800/80 px-5 flex items-center justify-between shrink-0 z-20">
-    <!-- Left: Brand & Credentials -->
-    <div class="flex items-center space-x-4">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">
-        <i data-lucide="shield-check" class="w-5 h-5"></i>
-      </div>
-      <div>
-        <div class="flex items-center space-x-2">
-          <span class="font-bold tracking-wider text-base text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300">AERO-FLOW</span>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-950/80 text-blue-400 border border-blue-800/50">Q09 ZERO-DEFECT</span>
-        </div>
-        <div class="text-xs text-slate-400 flex items-center space-x-2">
-          <span>Lokesh Maurya</span>
-          <span class="text-slate-600">•</span>
-          <span class="text-cyan-400 font-mono text-[11px]">2410302033</span>
-          <span class="text-slate-600">•</span>
-          <span>BBAT104 TQM</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Center: Engine Status Indicator -->
-    <div class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-xs">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      <span class="text-slate-300 font-medium">Poka-Yoke Validation Engine Active</span>
-      <span class="text-slate-600">|</span>
-      <span class="text-slate-400 font-mono text-[11px]">SQLite 3.x</span>
-    </div>
-
-    <!-- Right: Header Actions -->
-    <div class="flex items-center space-x-2.5">
-      <button onclick="openModal('addModal')" class="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition shadow-md shadow-blue-600/20">
-        <i data-lucide="plus" class="w-4 h-4"></i>
-        <span>Add Verified Item</span>
-      </button>
-      <button onclick="simulateDefectPrompt()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-800/50 text-xs font-medium transition" title="Trigger intentional defect to show Poka-Yoke trap">
-        <i data-lucide="zap" class="w-4 h-4 text-red-400"></i>
-        <span class="hidden sm:inline">Test Poka-Yoke</span>
-      </button>
-      <button onclick="exportCSV()" class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" title="Export CSV Report">
-        <i data-lucide="download" class="w-4 h-4"></i>
-      </button>
-      <button onclick="refreshAll()" class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" title="Refresh All Data">
-        <i data-lucide="refresh-cw" class="w-4 h-4" id="refreshIcon"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- ===================================================================== -->
-  <!-- MAIN WORKSPACE (SIDEBAR + CONTENT VIEWPORT) -->
-  <!-- ===================================================================== -->
-  <div class="flex flex-1 overflow-hidden">
-    
-    <!-- LEFT SIDEBAR NAVIGATION -->
-    <aside class="w-64 bg-[#0a0f1d] border-r border-slate-800/80 flex flex-col justify-between shrink-0 p-3">
-      <div class="space-y-1">
-        <div class="px-3 py-2 text-[10px] font-bold tracking-wider text-slate-500 uppercase">Workspaces</div>
-        
-        <button onclick="switchView('inventory')" id="nav-inventory" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold bg-blue-600/10 text-cyan-400 border border-blue-500/20 transition group">
-          <div class="flex items-center space-x-2.5">
-            <i data-lucide="boxes" class="w-4 h-4"></i>
-            <span>Inventory Master</span>
-          </div>
-          <span id="badge-sku-count" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">0</span>
-        </button>
-
-        <button onclick="switchView('bugs')" id="nav-bugs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition group">
-          <div class="flex items-center space-x-2.5">
-            <i data-lucide="shield-alert" class="w-4 h-4 text-red-400"></i>
-            <span>Defect Tracker (Q09)</span>
-          </div>
-          <span id="badge-open-bugs" class="text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 text-red-400 font-mono border border-red-900/50">0</span>
-        </button>
-
-        <button onclick="switchView('analytics')" id="nav-analytics" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition group">
-          <div class="flex items-center space-x-2.5">
-            <i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-400"></i>
-            <span>TQM SQC Analytics</span>
-          </div>
-          <span class="text-[10px] text-purple-400 font-mono">80/20</span>
-        </button>
-
-        <button onclick="switchView('logs')" id="nav-logs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition group">
-          <div class="flex items-center space-x-2.5">
-            <i data-lucide="terminal" class="w-4 h-4 text-amber-400"></i>
-            <span>Live Audit Console</span>
-          </div>
-        </button>
-
-        <button onclick="switchView('knowledge')" id="nav-knowledge" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition group">
-          <div class="flex items-center space-x-2.5">
-            <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
-            <span>Knowledge Base & SOP</span>
-          </div>
-        </button>
-      </div>
-
-      <!-- Sidebar Bottom Attribution Box -->
-      <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-800/80 text-xs">
-        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Academic Project</div>
-        <div class="font-bold text-slate-200">Lokesh Maurya</div>
-        <div class="text-slate-400 text-[11px] font-mono">Roll: 2410302033</div>
-        <div class="text-slate-400 text-[11px]">CSE - B • BBAT104 TQM</div>
-        <div class="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] text-emerald-400">
-          <span>Zero-Defect Goal</span>
-          <span class="font-mono font-bold">Q09</span>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN VIEW CONTAINER -->
-    <main class="flex-1 overflow-y-auto bg-[#070a13] p-5 flex flex-col space-y-4">
+  <div id="login-view" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-8 space-y-6">
       
-      <!-- =================================================================== -->
-      <!-- DYNAMIC KPI STRIP -->
-      <!-- =================================================================== -->
-      <section class="grid grid-cols-2 md:grid-cols-5 gap-3 shrink-0">
-        <!-- Card 1: Total SKUs -->
-        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-col justify-between hover:border-cyan-500/30 transition">
-          <div class="text-xs font-semibold text-slate-400 flex items-center justify-between">
-            <span>TOTAL SKUs</span>
-            <i data-lucide="box" class="w-4 h-4 text-cyan-400"></i>
-          </div>
-          <div class="text-2xl font-bold font-mono text-cyan-400 my-1" id="kpi-skus">0</div>
-          <div class="text-[11px] text-slate-400">Active Catalog Items</div>
+      <!-- Brand Logo & Header -->
+      <div class="text-center space-y-2">
+        <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 items-center justify-center text-white shadow-lg shadow-emerald-500/20 mb-1">
+          <i data-lucide="shield-check" class="w-6 h-6"></i>
         </div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">AERO-FLOW</h1>
+        <p class="text-xs text-slate-500">Inventory & Quality Control Workspace</p>
+      </div>
 
-        <!-- Card 2: Total Units -->
-        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-col justify-between hover:border-blue-500/30 transition">
-          <div class="text-xs font-semibold text-slate-400 flex items-center justify-between">
-            <span>TOTAL STOCK</span>
-            <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i>
-          </div>
-          <div class="text-2xl font-bold font-mono text-blue-400 my-1" id="kpi-units">0</div>
-          <div class="text-[11px] text-slate-400">Warehouse Units</div>
-        </div>
-
-        <!-- Card 3: Asset Valuation -->
-        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-col justify-between hover:border-purple-500/30 transition">
-          <div class="text-xs font-semibold text-slate-400 flex items-center justify-between">
-            <span>VALUATION</span>
-            <i data-lucide="indian-rupee" class="w-4 h-4 text-purple-400"></i>
-          </div>
-          <div class="text-2xl font-bold font-mono text-purple-300 my-1 truncate" id="kpi-val">₹ 0.00</div>
-          <div class="text-[11px] text-slate-400">Inventory Asset Worth</div>
-        </div>
-
-        <!-- Card 4: Low Stock Alerts -->
-        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-col justify-between hover:border-amber-500/30 transition">
-          <div class="text-xs font-semibold text-slate-400 flex items-center justify-between">
-            <span>LOW STOCK</span>
-            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
-          </div>
-          <div class="text-2xl font-bold font-mono text-amber-400 my-1" id="kpi-low">0</div>
-          <div class="text-[11px] text-slate-400">≤ Reorder Level</div>
-        </div>
-
-        <!-- Card 5: Trapped Defects (Q09) -->
-        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-col justify-between hover:border-red-500/30 transition">
-          <div class="text-xs font-semibold text-slate-400 flex items-center justify-between">
-            <span>TRAPPED BUGS</span>
-            <i data-lucide="bug" class="w-4 h-4 text-red-400"></i>
-          </div>
-          <div class="text-2xl font-bold font-mono text-red-400 my-1" id="kpi-bugs">0</div>
-          <div class="text-[11px] text-emerald-400 font-medium">100% Interception Rate</div>
-        </div>
-      </section>
-
-      <!-- =================================================================== -->
-      <!-- VIEW 1: INVENTORY MASTER -->
-      <!-- =================================================================== -->
-      <section id="view-inventory" class="flex-1 flex flex-col space-y-3">
-        <!-- Toolbar Filters -->
-        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center space-x-3 flex-1 min-w-[280px]">
-            <div class="relative flex-1">
-              <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-2.5"></i>
-              <input type="text" id="inv-search" oninput="filterInventoryTable()" placeholder="Search by SKU, Name, or Category..." class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
-            </div>
-            <select id="inv-cat-filter" onchange="filterInventoryTable()" class="bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
-              <option value="ALL">All Categories</option>
-            </select>
-          </div>
-
-          <!-- Quick Stock Status Pills -->
-          <div class="flex items-center space-x-1 bg-[#0a0f1d] p-1 rounded-lg border border-slate-800 text-xs">
-            <button onclick="setStockStatusFilter('ALL')" id="pill-all" class="px-2.5 py-1 rounded font-medium bg-blue-600 text-white transition">All Items</button>
-            <button onclick="setStockStatusFilter('LOW')" id="pill-low" class="px-2.5 py-1 rounded font-medium text-slate-400 hover:text-slate-200 transition">⚠️ Low Stock</button>
-            <button onclick="setStockStatusFilter('HEALTHY')" id="pill-healthy" class="px-2.5 py-1 rounded font-medium text-slate-400 hover:text-slate-200 transition">✅ Healthy</button>
-            <button onclick="setStockStatusFilter('OUT')" id="pill-out" class="px-2.5 py-1 rounded font-medium text-slate-400 hover:text-slate-200 transition">❌ Out of Stock</button>
+      <!-- Login Form -->
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Username</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+            <input type="text" id="login-username" value="Lokesh Maurya" placeholder="Enter username" required
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition">
           </div>
         </div>
 
-        <!-- Inventory Table -->
-        <div class="flex-1 bg-slate-900/60 rounded-xl border border-slate-800/90 overflow-hidden flex flex-col">
-          <div class="overflow-x-auto overflow-y-auto max-h-[500px]">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead class="bg-[#0a0f1d]/90 sticky top-0 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
-                <tr>
-                  <th class="py-3 px-4">SKU Code</th>
-                  <th class="py-3 px-4">Item Name</th>
-                  <th class="py-3 px-4">Category</th>
-                  <th class="py-3 px-4 text-center">Stock Level</th>
-                  <th class="py-3 px-4 text-right">Unit Price</th>
-                  <th class="py-3 px-4 text-right">Total Value</th>
-                  <th class="py-3 px-4 text-center">Reorder Limit</th>
-                  <th class="py-3 px-4 text-center">Health Status</th>
-                  <th class="py-3 px-4 text-center">Quick Adjust & Actions</th>
-                </tr>
-              </thead>
-              <tbody id="inventory-table-body" class="divide-y divide-slate-800/50">
-                <!-- Injected via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- =================================================================== -->
-      <!-- VIEW 2: QUALITY BUG TRACKER (Q09) -->
-      <!-- =================================================================== -->
-      <section id="view-bugs" class="hidden flex-1 flex flex-col space-y-3">
-        <!-- Defect Filter Toolbar -->
-        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-bold text-slate-300">🛡️ Defect Lifecycle Workflow</span>
-            <span class="text-[10px] text-slate-500">• Q09 Goal Verification</span>
-          </div>
-
-          <div class="flex items-center space-x-2">
-            <select id="bug-status-filter" onchange="filterBugsTable()" class="bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
-              <option value="ALL">All Statuses</option>
-              <option value="Open">Open</option>
-              <option value="In-Progress">In-Progress</option>
-              <option value="Resolved">Resolved</option>
-            </select>
-            <select id="bug-sev-filter" onchange="filterBugsTable()" class="bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
-              <option value="ALL">All Severities</option>
-              <option value="4-5">Severity 4-5 (Critical / DB)</option>
-              <option value="2-3">Severity 2-3 (Validation / Stock)</option>
-              <option value="1">Severity 1 (Info)</option>
-            </select>
-            <button onclick="clearResolvedBugs()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition">
-              🧹 Clear Resolved
-            </button>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+            <input type="password" id="login-password" value="••••••••" placeholder="Enter password" required
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition">
           </div>
         </div>
 
-        <!-- Bugs Table Container -->
-        <div class="flex-1 bg-slate-900/60 rounded-xl border border-slate-800/90 overflow-hidden flex flex-col">
-          <div class="overflow-x-auto overflow-y-auto max-h-[500px]">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead class="bg-[#0a0f1d]/90 sticky top-0 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
-                <tr>
-                  <th class="py-3 px-4 text-center">ID</th>
-                  <th class="py-3 px-4">Timestamp</th>
-                  <th class="py-3 px-4">Origin Module</th>
-                  <th class="py-3 px-4">Defect Classification</th>
-                  <th class="py-3 px-4 text-center">Severity</th>
-                  <th class="py-3 px-4 text-center">Current Status</th>
-                  <th class="py-3 px-4">Captured Details / Reason</th>
-                  <th class="py-3 px-4 text-center">Transition Actions</th>
-                </tr>
-              </thead>
-              <tbody id="bugs-table-body" class="divide-y divide-slate-800/50">
-                <!-- Injected via JavaScript -->
-              </tbody>
-            </table>
-          </div>
+        <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input type="checkbox" id="remember-me" checked class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+            <span>Remember session</span>
+          </label>
+          <span class="text-slate-400 text-[11px]">Desktop Edition</span>
         </div>
-      </section>
 
-      <!-- =================================================================== -->
-      <!-- VIEW 3: TQM SQC ANALYTICS & VISUALIZATIONS -->
-      <!-- =================================================================== -->
-      <section id="view-analytics" class="hidden flex-1 flex flex-col space-y-4">
+        <button type="submit"
+          class="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-md shadow-emerald-600/20 active:scale-[0.99]">
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <span>Sign In to Workspace</span>
+        </button>
+      </form>
+
+      <!-- System Notice -->
+      <div class="pt-3 border-t border-slate-100 text-center">
+        <p class="text-[11px] text-slate-400">Poka-Yoke Protected • SQLite Persistence</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 2. MAIN APPLICATION SHELL (AFTER LOGIN) -->
+  <!-- ===================================================================== -->
+  <div id="app-shell" class="hidden flex flex-col h-screen overflow-hidden">
+    
+    <!-- TOP APPLICATION HEADER -->
+    <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 z-20">
+      
+      <!-- Left: Logo, Name & User Greeting -->
+      <div class="flex items-center space-x-4">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center font-bold text-white shadow-md shadow-emerald-500/20">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
         
-        <!-- Tabbed Analytics Bar -->
-        <div class="flex items-center space-x-2 bg-slate-900/60 p-1 rounded-xl border border-slate-800 text-xs shrink-0">
-          <button onclick="setAnalyticsSubTab('pareto')" id="tab-pareto" class="px-4 py-2 rounded-lg font-bold bg-blue-600 text-white transition">📊 Pareto Analysis (80/20 Rule)</button>
-          <button onclick="setAnalyticsSubTab('fishbone')" id="tab-fishbone" class="px-4 py-2 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition">🐟 Ishikawa Root Cause</button>
-          <button onclick="setAnalyticsSubTab('fmea')" id="tab-fmea" class="px-4 py-2 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition">📋 FMEA Risk Scorecard</button>
-          <button onclick="setAnalyticsSubTab('pdca')" id="tab-pdca" class="px-4 py-2 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition">🔄 PDCA Kaizen Cycles</button>
-        </div>
-
-        <!-- Subtab 1: Interactive Pareto Analysis -->
-        <div id="subview-pareto" class="space-y-4">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <!-- Chart Container (2 cols) -->
-            <div class="lg:col-span-2 p-5 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-col">
-              <div class="flex items-center justify-between mb-4">
-                <div>
-                  <h3 class="text-sm font-bold text-cyan-400">Pareto 80/20 Defect Elimination Matrix</h3>
-                  <p class="text-xs text-slate-400">Vital Few Causes (Input Formatting & Underflows) accounting for >80% of faults</p>
-                </div>
-                <button onclick="loadParetoChart()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition" title="Reload Chart">
-                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-              <div class="h-72 w-full relative">
-                <canvas id="paretoCanvas"></canvas>
-              </div>
-            </div>
-
-            <!-- Insight Card (1 col) -->
-            <div class="p-5 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-col justify-between space-y-4">
-              <div>
-                <div class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">TQM SQC Statistical Analysis</div>
-                <h4 class="text-base font-bold text-slate-100">80/20 Principle Verification</h4>
-                <p class="text-xs text-slate-300 mt-2 leading-relaxed">
-                  Historical fault logs reveal that over 80% of runtime defects stemmed from two primary human-error categories: 
-                  <span class="text-cyan-400 font-semibold">1. Data type formatting slips</span> and 
-                  <span class="text-blue-400 font-semibold">2. Stock deduction underflow attempts</span>.
-                </p>
-                <div class="mt-4 p-3 rounded-lg bg-blue-950/40 border border-blue-900/50 text-xs text-blue-300">
-                  <div class="font-bold flex items-center space-x-1.5 mb-1">
-                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-                    <span>Poka-Yoke Countermeasure:</span>
-                  </div>
-                  Enforcing regex masks (<code class="text-cyan-300 font-mono">^SKU-[A-Z0-9]{3,8}$</code>) and boundary guards in <code class="text-cyan-300 font-mono">validate_item_data()</code> eliminated 100% of these failure modes.
-                </div>
-              </div>
-
-              <!-- Quick Donut Chart -->
-              <div class="h-36 w-full relative">
-                <canvas id="categoryDonutCanvas"></canvas>
-              </div>
-            </div>
+        <div class="flex items-center space-x-3">
+          <span class="font-bold tracking-wider text-base text-slate-900">AERO-FLOW</span>
+          <span class="h-4 w-px bg-slate-200"></span>
+          <!-- User Greeting Badge -->
+          <div class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-xs font-medium text-emerald-800">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span id="user-greeting-text">Hello, Lokesh Maurya</span>
           </div>
         </div>
+      </div>
 
-        <!-- Subtab 2: Ishikawa Fishbone Diagram -->
-        <div id="subview-fishbone" class="hidden space-y-4">
-          <div class="p-5 rounded-xl bg-slate-900/60 border border-slate-800/90">
-            <h3 class="text-sm font-bold text-cyan-400 mb-1">Ishikawa (Fishbone) Cause-and-Effect Root Cause Diagram</h3>
-            <p class="text-xs text-slate-400 mb-4">Deconstructing software runtime defects across People, Process, Methods, and Technology</p>
-            
-            <!-- Visual Tree of Root Causes -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <!-- Branch 1: People -->
-              <div class="p-4 rounded-xl bg-[#0a0f1d] border border-blue-900/40">
-                <div class="font-bold text-xs text-blue-400 flex items-center space-x-1.5 mb-2.5">
-                  <i data-lucide="users" class="w-4 h-4"></i>
-                  <span>People (Staff / Users)</span>
-                </div>
-                <ul class="text-xs text-slate-300 space-y-2">
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Typing slips entering non-standard SKU codes.</span>
-                  </li>
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Untrained inventory clerk entering letters into price field.</span>
-                  </li>
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Accidental overselling attempts causing negative balance.</span>
-                  </li>
-                </ul>
-              </div>
+      <!-- Right: Action Buttons & Logout -->
+      <div class="flex items-center space-x-2.5">
+        <button onclick="openModal('addModal')" class="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-sm shadow-emerald-600/20">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Add Verified Item</span>
+        </button>
+        
+        <button onclick="exportCSV()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-medium transition" title="Export CSV Report">
+          <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
+          <span>Export CSV</span>
+        </button>
 
-              <!-- Branch 2: Process -->
-              <div class="p-4 rounded-xl bg-[#0a0f1d] border border-purple-900/40">
-                <div class="font-bold text-xs text-purple-400 flex items-center space-x-1.5 mb-2.5">
-                  <i data-lucide="git-pull-request" class="w-4 h-4"></i>
-                  <span>Process & Testing</span>
-                </div>
-                <ul class="text-xs text-slate-300 space-y-2">
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Absence of automated regression test execution.</span>
-                  </li>
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Untracked exception stack traces hidden from QA.</span>
-                  </li>
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-emerald-400">•</span>
-                    <span>Remedy: Automated unittest suite in tests/test_inventory.py.</span>
-                  </li>
-                </ul>
-              </div>
+        <button onclick="refreshAll()" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition" title="Refresh All Data">
+          <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-500" id="refreshIcon"></i>
+        </button>
 
-              <!-- Branch 3: Methods -->
-              <div class="p-4 rounded-xl bg-[#0a0f1d] border border-cyan-900/40">
-                <div class="font-bold text-xs text-cyan-400 flex items-center space-x-1.5 mb-2.5">
-                  <i data-lucide="sliders" class="w-4 h-4"></i>
-                  <span>Methods (Validation)</span>
-                </div>
-                <ul class="text-xs text-slate-300 space-y-2">
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Missing defensive boundary checks at client side.</span>
-                  </li>
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Negative stock lower limit ignored before SQL execution.</span>
-                  </li>
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-emerald-400">•</span>
-                    <span>Remedy: Defensive Poka-Yoke input barrier in logic tier.</span>
-                  </li>
-                </ul>
-              </div>
+        <!-- Dedicated Logout Button -->
+        <button onclick="handleLogout()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium transition ml-1" title="End Session & Return to Login">
+          <i data-lucide="log-out" class="w-4 h-4 text-rose-500"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </header>
 
-              <!-- Branch 4: Technology -->
-              <div class="p-4 rounded-xl bg-[#0a0f1d] border border-amber-900/40">
-                <div class="font-bold text-xs text-amber-400 flex items-center space-x-1.5 mb-2.5">
-                  <i data-lucide="database" class="w-4 h-4"></i>
-                  <span>Technology (DB / SQLite)</span>
-                </div>
-                <ul class="text-xs text-slate-300 space-y-2">
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Uncaught SQLite UNIQUE constraint on duplicate SKUs.</span>
-                  </li>
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-red-400">•</span>
-                    <span>Database write locks inducing application freezes.</span>
-                  </li>
-                  <li class="flex items-start space-x-1.5">
-                    <span class="text-emerald-400">•</span>
-                    <span>Remedy: Resilient try-except blocks + 20s connection timeout.</span>
-                  </li>
-                </ul>
-              </div>
+    <!-- MAIN BODY (SIDEBAR + WORKSPACE) -->
+    <div class="flex flex-1 overflow-hidden">
+      
+      <!-- LEFT SIDEBAR -->
+      <aside class="w-64 bg-slate-50/80 border-r border-slate-200 flex flex-col justify-between shrink-0 p-3">
+        <div class="space-y-1">
+          <div class="px-3 py-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Workspaces</div>
+          
+          <!-- 1. Inventory Master -->
+          <button onclick="switchView('inventory')" id="nav-inventory" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 transition group">
+            <div class="flex items-center space-x-2.5">
+              <i data-lucide="boxes" class="w-4 h-4 text-emerald-600"></i>
+              <span>Inventory Master</span>
             </div>
-          </div>
+            <span id="badge-sku-count" class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono font-bold">0</span>
+          </button>
+
+          <!-- 2. Defect Tracker (Q09) -->
+          <button onclick="switchView('bugs')" id="nav-bugs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition group">
+            <div class="flex items-center space-x-2.5">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-rose-500"></i>
+              <span>Defect Tracker (Q09)</span>
+            </div>
+            <span id="badge-open-bugs" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-mono font-bold">0</span>
+          </button>
+
+          <!-- 3. Live Audit Console -->
+          <button onclick="switchView('logs')" id="nav-logs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition group">
+            <div class="flex items-center space-x-2.5">
+              <i data-lucide="terminal" class="w-4 h-4 text-amber-500"></i>
+              <span>Live Audit Console</span>
+            </div>
+          </button>
         </div>
 
-        <!-- Subtab 3: FMEA Risk Scorecard -->
-        <div id="subview-fmea" class="hidden space-y-4">
-          <div class="p-5 rounded-xl bg-slate-900/60 border border-slate-800/90">
-            <!-- Cumulative Metric Card -->
-            <div class="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-950/60 via-indigo-950/40 to-slate-900 border border-blue-900/50 mb-4">
-              <div>
-                <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Cumulative Risk Reduction</span>
-                <div class="text-2xl font-bold font-mono text-cyan-400">1,462 ➔ 100 RPN</div>
+        <!-- Clean System Status Box (Replaces Academic Metadata Card) -->
+        <div class="p-3 rounded-xl bg-white border border-slate-200 text-xs shadow-xs space-y-1.5">
+          <div class="flex items-center justify-between text-slate-700">
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="font-semibold text-slate-800">System Ready</span>
+            </div>
+            <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Active</span>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span>Database:</span>
+            <span class="font-mono text-slate-600 font-medium">SQLite 3.x</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN WORKSPACE CONTENT -->
+      <main class="flex-1 overflow-y-auto bg-slate-50/50 p-6 flex flex-col space-y-4">
+        
+        <!-- KPI METRIC RIBBON -->
+        <section class="grid grid-cols-2 md:grid-cols-5 gap-3.5 shrink-0">
+          
+          <!-- Card 1: Total SKUs -->
+          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-emerald-300 transition">
+            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+              <span>TOTAL SKUs</span>
+              <i data-lucide="box" class="w-4 h-4 text-emerald-600"></i>
+            </div>
+            <div class="text-2xl font-bold font-mono text-slate-900 my-1" id="kpi-skus">0</div>
+            <div class="text-[11px] text-slate-400">Active Catalog Items</div>
+          </div>
+
+          <!-- Card 2: Total Units -->
+          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-blue-300 transition">
+            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+              <span>TOTAL STOCK</span>
+              <i data-lucide="layers" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <div class="text-2xl font-bold font-mono text-blue-700 my-1" id="kpi-units">0</div>
+            <div class="text-[11px] text-slate-400">Warehouse Units</div>
+          </div>
+
+          <!-- Card 3: Asset Valuation -->
+          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-purple-300 transition">
+            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+              <span>VALUATION</span>
+              <i data-lucide="indian-rupee" class="w-4 h-4 text-purple-600"></i>
+            </div>
+            <div class="text-2xl font-bold font-mono text-purple-700 my-1 truncate" id="kpi-val">₹ 0.00</div>
+            <div class="text-[11px] text-slate-400">Inventory Asset Worth</div>
+          </div>
+
+          <!-- Card 4: Low Stock Alerts -->
+          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-amber-300 transition">
+            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+              <span>LOW STOCK</span>
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+            </div>
+            <div class="text-2xl font-bold font-mono text-amber-600 my-1" id="kpi-low">0</div>
+            <div class="text-[11px] text-slate-400">≤ Reorder Level</div>
+          </div>
+
+          <!-- Card 5: Trapped Defects -->
+          <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between hover:border-rose-300 transition">
+            <div class="text-xs font-semibold text-slate-500 flex items-center justify-between">
+              <span>TRAPPED BUGS</span>
+              <i data-lucide="bug" class="w-4 h-4 text-rose-500"></i>
+            </div>
+            <div class="text-2xl font-bold font-mono text-rose-600 my-1" id="kpi-bugs">0</div>
+            <div class="text-[11px] text-emerald-600 font-medium">100% Intercepted</div>
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VIEW 1: INVENTORY MASTER -->
+        <!-- ================================================================= -->
+        <section id="view-inventory" class="flex-1 flex flex-col space-y-3">
+          
+          <!-- Toolbar & Filters -->
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3 flex-1 min-w-[280px]">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                <input type="text" id="inv-search" oninput="filterInventoryTable()" placeholder="Search by SKU, Name, or Category..." 
+                  class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
               </div>
-              <div class="text-right">
-                <span class="text-xs text-emerald-400 font-bold bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-800">
-                  ▼ 93.1% TOTAL RISK REDUCTION
-                </span>
-                <div class="text-[11px] text-slate-400 mt-1">All Operational Risks Brought Below Critical Threshold (&lt;100)</div>
-              </div>
+              <select id="inv-cat-filter" onchange="filterInventoryTable()" 
+                class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-emerald-500">
+                <option value="ALL">All Categories</option>
+              </select>
             </div>
 
-            <!-- FMEA Breakdown Table -->
-            <div class="overflow-x-auto">
+            <!-- Quick Status Filter Pills -->
+            <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+              <button onclick="setStockStatusFilter('ALL')" id="pill-all" class="px-2.5 py-1 rounded font-medium bg-white text-emerald-700 shadow-xs transition">All Items</button>
+              <button onclick="setStockStatusFilter('LOW')" id="pill-low" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition">⚠️ Low Stock</button>
+              <button onclick="setStockStatusFilter('HEALTHY')" id="pill-healthy" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition">✅ Healthy</button>
+              <button onclick="setStockStatusFilter('OUT')" id="pill-out" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition">❌ Out of Stock</button>
+            </div>
+          </div>
+
+          <!-- Inventory Table -->
+          <div class="flex-1 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+            <div class="overflow-x-auto overflow-y-auto max-h-[500px]">
               <table class="w-full text-left text-xs border-collapse">
-                <thead class="bg-[#0a0f1d] text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-800">
+                <thead class="bg-slate-50 sticky top-0 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider">
                   <tr>
-                    <th class="py-2.5 px-3">Process Function</th>
-                    <th class="py-2.5 px-3">Failure Mode</th>
-                    <th class="py-2.5 px-3 text-center">Initial RPN</th>
-                    <th class="py-2.5 px-3">Q09 Poka-Yoke Mitigation Control</th>
-                    <th class="py-2.5 px-3 text-center">Revised RPN</th>
-                    <th class="py-2.5 px-3 text-center">Reduction</th>
+                    <th class="py-3 px-4">SKU Code</th>
+                    <th class="py-3 px-4">Item Name</th>
+                    <th class="py-3 px-4">Category</th>
+                    <th class="py-3 px-4 text-center">Stock Level</th>
+                    <th class="py-3 px-4 text-right">Unit Price</th>
+                    <th class="py-3 px-4 text-right">Total Value</th>
+                    <th class="py-3 px-4 text-center">Reorder Limit</th>
+                    <th class="py-3 px-4 text-center">Status</th>
+                    <th class="py-3 px-4 text-center">Quick Adjust & Actions</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-800 text-slate-300">
-                  <tr>
-                    <td class="py-2.5 px-3 font-semibold text-slate-200">Data Entry</td>
-                    <td class="py-2.5 px-3">Non-numeric or negative quantity entered</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-red-400 font-bold">392</td>
-                    <td class="py-2.5 px-3 text-cyan-300">Poka-Yoke type cast and bounds checking in validate_item_data()</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-emerald-400 font-bold">28</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-emerald-400">▼ 92.8%</td>
-                  </tr>
-                  <tr>
-                    <td class="py-2.5 px-3 font-semibold text-slate-200">Stock Checkout</td>
-                    <td class="py-2.5 px-3">Deduction exceeds balance (phantom stock)</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-red-400 font-bold">288</td>
-                    <td class="py-2.5 px-3 text-cyan-300">Automated lower-bound balance validation in update_stock()</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-emerald-400 font-bold">16</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-emerald-400">▼ 94.4%</td>
-                  </tr>
-                  <tr>
-                    <td class="py-2.5 px-3 font-semibold text-slate-200">Database Persistence</td>
-                    <td class="py-2.5 px-3">Duplicate SKU clashing in SQLite table</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-red-400 font-bold">294</td>
-                    <td class="py-2.5 px-3 text-cyan-300">try-except IntegrityError trapping with user friendly modal feedback</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-emerald-400 font-bold">28</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-emerald-400">▼ 90.5%</td>
-                  </tr>
-                  <tr>
-                    <td class="py-2.5 px-3 font-semibold text-slate-200">SKU Code Generation</td>
-                    <td class="py-2.5 px-3">Arbitrary malformed SKU codes</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-red-400 font-bold">200</td>
-                    <td class="py-2.5 px-3 text-cyan-300">Strict regex mask (^SKU-[A-Z0-9]{3,8}$)</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-emerald-400 font-bold">10</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-emerald-400">▼ 95.0%</td>
-                  </tr>
-                  <tr>
-                    <td class="py-2.5 px-3 font-semibold text-slate-200">Runtime Execution</td>
-                    <td class="py-2.5 px-3">Unhandled crash / SQLite lockup</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-red-400 font-bold">288</td>
-                    <td class="py-2.5 px-3 text-cyan-300">Global exception handling routing trace to system_errors.log</td>
-                    <td class="py-2.5 px-3 text-center font-mono text-emerald-400 font-bold">18</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-emerald-400">▼ 93.7%</td>
-                  </tr>
+                <tbody id="inventory-table-body" class="divide-y divide-slate-100 text-slate-700">
+                  <!-- Dynamically populated -->
                 </tbody>
               </table>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Subtab 4: PDCA Kaizen Cycles -->
-        <div id="subview-pdca" class="hidden space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Cycle 1 -->
-            <div class="p-5 rounded-xl bg-slate-900/60 border border-slate-800/90 space-y-3">
-              <div class="flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                <h4 class="text-sm font-bold text-slate-100">PDCA Cycle 1: Eliminating Data Entry Errors</h4>
-              </div>
-              <div class="space-y-2 text-xs">
-                <div class="p-2.5 rounded-lg bg-[#0a0f1d] border border-slate-800">
-                  <span class="text-cyan-400 font-bold font-mono">[PLAN]</span> 48% baseline failure rate on typing slips. Target: 0% data validation defects.
-                </div>
-                <div class="p-2.5 rounded-lg bg-[#0a0f1d] border border-slate-800">
-                  <span class="text-amber-400 font-bold font-mono">[DO]</span> Enforced regex syntax, integer bounds, and strictly positive price rules.
-                </div>
-                <div class="p-2.5 rounded-lg bg-[#0a0f1d] border border-slate-800">
-                  <span class="text-red-400 font-bold font-mono">[CHECK]</span> Executed unittest suite in tests/test_inventory.py (6/6 passing in 0.05s).
-                </div>
-                <div class="p-2.5 rounded-lg bg-[#0a0f1d] border border-slate-800">
-                  <span class="text-emerald-400 font-bold font-mono">[ACT]</span> Standardized Poka-Yoke validation layer across all client forms and REST APIs.
-                </div>
-              </div>
+        <!-- ================================================================= -->
+        <!-- VIEW 2: DEFECT TRACKER (Q09) -->
+        <!-- ================================================================= -->
+        <section id="view-bugs" class="hidden flex-1 flex flex-col space-y-3">
+          
+          <!-- Defect Filter Toolbar -->
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold text-slate-800">🛡️ Defect Lifecycle Workflow</span>
+              <span class="text-[11px] text-slate-400">• Quality Goal Verification</span>
             </div>
 
-            <!-- Cycle 2 -->
-            <div class="p-5 rounded-xl bg-slate-900/60 border border-slate-800/90 space-y-3">
-              <div class="flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                <h4 class="text-sm font-bold text-slate-100">PDCA Cycle 2: Crash-Proof Exception Handling</h4>
-              </div>
-              <div class="space-y-2 text-xs">
-                <div class="p-2.5 rounded-lg bg-[#0a0f1d] border border-slate-800">
-                  <span class="text-cyan-400 font-bold font-mono">[PLAN]</span> Prevent silent console crashes and SQLite database write locks. Target: 0 crashes.
-                </div>
-                <div class="p-2.5 rounded-lg bg-[#0a0f1d] border border-slate-800">
-                  <span class="text-amber-400 font-bold font-mono">[DO]</span> Wrapped SQLite transactions with rollback/close before logging, set 20s timeout.
-                </div>
-                <div class="p-2.5 rounded-lg bg-[#0a0f1d] border border-slate-800">
-                  <span class="text-red-400 font-bold font-mono">[CHECK]</span> Simulated concurrent write locks; confirmed zero application deadlocks.
-                </div>
-                <div class="p-2.5 rounded-lg bg-[#0a0f1d] border border-slate-800">
-                  <span class="text-emerald-400 font-bold font-mono">[ACT]</span> Built interactive Defect Tracker UI with 1-click status transitions.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            <div class="flex items-center space-x-2">
+              <select id="bug-status-filter" onchange="filterBugsTable()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-emerald-500">
+                <option value="ALL">All Statuses</option>
+                <option value="Open">Open</option>
+                <option value="In-Progress">In-Progress</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+              
+              <select id="bug-sev-filter" onchange="filterBugsTable()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-emerald-500">
+                <option value="ALL">All Severities</option>
+                <option value="4-5">Severity 4-5 (Critical / DB)</option>
+                <option value="2-3">Severity 2-3 (Validation / Stock)</option>
+                <option value="1">Severity 1 (Info)</option>
+              </select>
 
-      <!-- =================================================================== -->
-      <!-- VIEW 4: LIVE SYSTEM AUDIT CONSOLE -->
-      <!-- =================================================================== -->
-      <section id="view-logs" class="hidden flex-1 flex flex-col space-y-3">
-        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/90 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-bold text-slate-300">🖥️ File Stream: logs/system_errors.log</span>
-            <span class="text-[10px] text-emerald-400 font-mono">• Live Stream</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <button onclick="loadLogs()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition">
-              🔄 Refresh Logs
-            </button>
-            <button onclick="clearLogs()" class="px-3 py-1.5 rounded-lg bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-800/50 text-xs transition">
-              🗑️ Clear Buffer
-            </button>
-          </div>
-        </div>
-
-        <div class="flex-1 bg-[#05070e] rounded-xl border border-slate-800/90 p-4 font-mono text-xs overflow-y-auto max-h-[500px] text-cyan-400 space-y-1" id="log-console">
-          <!-- Logs injected here -->
-        </div>
-      </section>
-
-      <!-- =================================================================== -->
-      <!-- VIEW 5: KNOWLEDGE BASE & SOP -->
-      <!-- =================================================================== -->
-      <section id="view-knowledge" class="hidden flex-1 space-y-4">
-        <div class="p-5 rounded-xl bg-slate-900/60 border border-slate-800/90 space-y-4">
-          <div>
-            <h3 class="text-base font-bold text-cyan-400">Total Quality Management (TQM) Knowledge Base & System SOP</h3>
-            <p class="text-xs text-slate-400">Course: Fundamentals of Total Quality Management (BBAT104) • Academic Session 2026–2027</p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 rounded-xl bg-[#0a0f1d] border border-slate-800 space-y-2">
-              <h4 class="text-xs font-bold text-slate-200">📌 Assigned Quality Goal Q09: Reduce Software Defects</h4>
-              <p class="text-xs text-slate-400 leading-relaxed">
-                Applies the principles of Total Quality Management to software reliability. Eliminates defects at point of entry using Poka-Yoke mistake-proofing, logs all anomalies with full traceability, and tracks continuous reduction in Cost of Poor Quality (COPQ).
-              </p>
-            </div>
-
-            <div class="p-4 rounded-xl bg-[#0a0f1d] border border-slate-800 space-y-2">
-              <h4 class="text-xs font-bold text-slate-200">👨‍🎓 Student & Academic Attribution</h4>
-              <div class="text-xs space-y-1 text-slate-300 font-mono">
-                <div>• Name: <span class="text-slate-100 font-bold">LOKESH MAURYA</span></div>
-                <div>• Roll No / Reg ID: <span class="text-cyan-400">2410302033</span></div>
-                <div>• Branch & Section: <span class="text-slate-100">CSE - B</span></div>
-                <div>• Assigned Goal: <span class="text-blue-400 font-bold">Q09 (Reduce Bugs)</span></div>
-              </div>
+              <button onclick="clearResolvedBugs()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-medium transition">
+                🧹 Clear Resolved
+              </button>
             </div>
           </div>
 
-          <div class="p-4 rounded-xl bg-[#0a0f1d] border border-slate-800 space-y-3">
-            <h4 class="text-xs font-bold text-cyan-400">🛡️ Poka-Yoke Operational Specifications (validate_item_data)</h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-              <div class="p-2.5 rounded-lg bg-slate-900/70 border border-slate-800">
-                <span class="text-blue-400 font-bold font-mono">1. SKU Regex</span>
-                <p class="text-slate-400 mt-1">^SKU-[A-Z0-9]{3,8}$ rejects malformed codes.</p>
-              </div>
-              <div class="p-2.5 rounded-lg bg-slate-900/70 border border-slate-800">
-                <span class="text-blue-400 font-bold font-mono">2. Positive Price</span>
-                <p class="text-slate-400 mt-1">unit_price &gt; 0 numeric cast guard.</p>
-              </div>
-              <div class="p-2.5 rounded-lg bg-slate-900/70 border border-slate-800">
-                <span class="text-blue-400 font-bold font-mono">3. Non-Negative Stock</span>
-                <p class="text-slate-400 mt-1">quantity &gt;= 0 lower bound guard.</p>
-              </div>
+          <!-- Bugs Table -->
+          <div class="flex-1 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+            <div class="overflow-x-auto overflow-y-auto max-h-[500px]">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead class="bg-slate-50 sticky top-0 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider">
+                  <tr>
+                    <th class="py-3 px-4 text-center">ID</th>
+                    <th class="py-3 px-4">Timestamp</th>
+                    <th class="py-3 px-4">Origin Module</th>
+                    <th class="py-3 px-4">Defect Classification</th>
+                    <th class="py-3 px-4 text-center">Severity</th>
+                    <th class="py-3 px-4 text-center">Current Status</th>
+                    <th class="py-3 px-4">Captured Details / Reason</th>
+                    <th class="py-3 px-4 text-center">Transition Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bugs-table-body" class="divide-y divide-slate-100 text-slate-700">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-    </main>
+        <!-- ================================================================= -->
+        <!-- VIEW 3: LIVE SYSTEM AUDIT CONSOLE -->
+        <!-- ================================================================= -->
+        <section id="view-logs" class="hidden flex-1 flex flex-col space-y-3">
+          
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold text-slate-800">🖥️ File Stream: logs/system_errors.log</span>
+              <span class="text-[10px] text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">• Live Stream</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="loadLogs()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs transition">
+                🔄 Refresh Logs
+              </button>
+              <button onclick="clearLogs()" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs transition">
+                🗑️ Clear Buffer
+              </button>
+            </div>
+          </div>
+
+          <!-- Console Stream Window -->
+          <div class="flex-1 bg-slate-900 rounded-xl border border-slate-800 p-4 font-mono text-xs overflow-y-auto max-h-[500px] text-emerald-400 space-y-1 shadow-inner" id="log-console">
+            <!-- Logs injected here -->
+          </div>
+        </section>
+
+      </main>
+    </div>
   </div>
 
   <!-- ===================================================================== -->
-  <!-- MODALS CONTAINER -->
+  <!-- MODALS -->
   <!-- ===================================================================== -->
 
-  <!-- 1. ADD ITEM MODAL (WITH LIVE POKA-YOKE VALIDATION) -->
-  <div id="addModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-[#0f172a] rounded-2xl border border-slate-800 p-6 space-y-4 shadow-2xl glow-cyan">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+  <!-- 1. ADD ITEM MODAL -->
+  <div id="addModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div>
-          <h3 class="text-base font-bold text-cyan-400">Add Verified Inventory Item</h3>
-          <p class="text-xs text-slate-400">Real-time Poka-Yoke validation active</p>
+          <h3 class="text-base font-bold text-slate-900">Add Verified Inventory Item</h3>
+          <p class="text-xs text-slate-500">Poka-Yoke validation rules active</p>
         </div>
-        <button onclick="closeModal('addModal')" class="text-slate-400 hover:text-slate-200">
+        <button onclick="closeModal('addModal')" class="text-slate-400 hover:text-slate-600">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -704,58 +416,64 @@
       <form onsubmit="handleAddItem(event)" class="space-y-3">
         <!-- SKU -->
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">SKU Code (Pattern: SKU-XXXX):</label>
-          <input type="text" id="add-sku" oninput="checkSkuLive()" placeholder="e.g. SKU-101 or SKU-PRO88" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-          <div id="sku-feedback" class="text-[10px] text-slate-500 mt-1 font-mono">Format: 'SKU-XXXX' (3-8 alphanumeric)</div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">SKU Code (Pattern: SKU-XXXX):</label>
+          <input type="text" id="add-sku" oninput="checkSkuLive()" placeholder="e.g. SKU-101 or SKU-PRO88" required 
+            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
+          <div id="sku-feedback" class="text-[10px] text-slate-400 mt-1 font-mono">Format: 'SKU-XXXX' (3-8 alphanumeric)</div>
         </div>
 
         <!-- Name -->
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Item Name (min 2 chars):</label>
-          <input type="text" id="add-name" placeholder="e.g. Mechanical RGB Keyboard" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Item Name (min 2 chars):</label>
+          <input type="text" id="add-name" placeholder="e.g. Mechanical RGB Keyboard" required 
+            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
         </div>
 
         <!-- Category -->
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Category:</label>
-          <input type="text" id="add-cat" placeholder="e.g. Peripherals, Display, Electronics" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Category:</label>
+          <input type="text" id="add-cat" placeholder="e.g. Peripherals, Display, Electronics" required 
+            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
         </div>
 
-        <!-- Qty & Price Row -->
+        <!-- Qty & Price -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Quantity (≥ 0):</label>
-            <input type="number" id="add-qty" min="0" placeholder="25" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Quantity (≥ 0):</label>
+            <input type="number" id="add-qty" min="0" placeholder="25" required 
+              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Unit Price ₹ (> 0):</label>
-            <input type="number" step="0.01" min="0.01" id="add-price" placeholder="1499.00" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Unit Price ₹ (> 0):</label>
+            <input type="number" step="0.01" min="0.01" id="add-price" placeholder="1499.00" required 
+              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
           </div>
         </div>
 
         <!-- Reorder Level -->
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Reorder Alert Level:</label>
-          <input type="number" id="add-reorder" min="0" value="5" class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Reorder Alert Level:</label>
+          <input type="number" id="add-reorder" min="0" value="5" 
+            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
         </div>
 
         <div class="pt-2 flex items-center justify-end space-x-2">
-          <button type="button" onclick="closeModal('addModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Cancel</button>
-          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-md shadow-blue-600/30">Verify & Add Item</button>
+          <button type="button" onclick="closeModal('addModal')" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-emerald-600/30">Verify & Add Item</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- 2. EDIT ITEM MODAL -->
-  <div id="editModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-[#0f172a] rounded-2xl border border-slate-800 p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+  <div id="editModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div>
-          <h3 class="text-base font-bold text-cyan-400">Edit Item Details</h3>
-          <p id="edit-sku-badge" class="text-xs text-slate-400 font-mono"></p>
+          <h3 class="text-base font-bold text-slate-900">Edit Item Details</h3>
+          <p id="edit-sku-badge" class="text-xs text-emerald-600 font-mono font-semibold"></p>
         </div>
-        <button onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-200">
+        <button onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-600">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -763,27 +481,31 @@
       <form onsubmit="handleEditItem(event)" class="space-y-3">
         <input type="hidden" id="edit-sku">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Item Name:</label>
-          <input type="text" id="edit-name" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Item Name:</label>
+          <input type="text" id="edit-name" required 
+            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Category:</label>
-          <input type="text" id="edit-cat" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Category:</label>
+          <input type="text" id="edit-cat" required 
+            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Unit Price ₹ (> 0):</label>
-            <input type="number" step="0.01" min="0.01" id="edit-price" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Unit Price ₹ (> 0):</label>
+            <input type="number" step="0.01" min="0.01" id="edit-price" required 
+              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Reorder Level:</label>
-            <input type="number" min="0" id="edit-reorder" required class="w-full bg-[#0a0f1d] border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Reorder Level:</label>
+            <input type="number" min="0" id="edit-reorder" required 
+              class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500">
           </div>
         </div>
 
         <div class="pt-2 flex items-center justify-end space-x-2">
-          <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Cancel</button>
-          <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">Save Updates</button>
+          <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-emerald-600/30">Save Updates</button>
         </div>
       </form>
     </div>
@@ -793,22 +515,110 @@
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
   <!-- ===================================================================== -->
-  <!-- FRONTEND APPLICATION SCRIPT -->
+  <!-- APPLICATION LOGIC & DATA SYNCHRONIZATION -->
   <!-- ===================================================================== -->
   <script>
-    // State Store
     let inventoryData = [];
     let bugsData = [];
     let activeStockStatusFilter = 'ALL';
-    let paretoChartInstance = null;
-    let donutChartInstance = null;
+    let currentUser = null;
 
-    // Initialize App
     document.addEventListener("DOMContentLoaded", () => {
       lucide.createIcons();
-      refreshAll();
+      checkAuthSession();
     });
 
+    // =========================================================================
+    // AUTHENTICATION SYSTEM
+    // =========================================================================
+    function checkAuthSession() {
+      const stored = localStorage.getItem('aeroflow_session');
+      if (stored) {
+        try {
+          currentUser = JSON.parse(stored);
+          renderAuthenticatedApp();
+          return;
+        } catch (e) {
+          localStorage.removeItem('aeroflow_session');
+        }
+      }
+      renderLoginScreen();
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+
+      if (!username) {
+        showToast('Please enter a username', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({username, password})
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
+          if (document.getElementById('remember-me').checked) {
+            localStorage.setItem('aeroflow_session', JSON.stringify(currentUser));
+          }
+          renderAuthenticatedApp();
+          showToast(`Welcome back, ${currentUser.displayName}!`, 'success');
+        } else {
+          showToast(data.message || 'Login failed', 'error');
+        }
+      } catch (err) {
+        // Fallback for local desktop offline run
+        const displayName = (username.toLowerCase().includes('lokesh') || username.toLowerCase() === 'admin') 
+          ? 'Lokesh Maurya' 
+          : username;
+        currentUser = {username, displayName, role: 'Administrator'};
+        if (document.getElementById('remember-me').checked) {
+          localStorage.setItem('aeroflow_session', JSON.stringify(currentUser));
+        }
+        renderAuthenticatedApp();
+        showToast(`Welcome back, ${currentUser.displayName}!`, 'success');
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch('/api/auth/logout', {method: 'POST'});
+      } catch (e) {}
+
+      currentUser = null;
+      localStorage.removeItem('aeroflow_session');
+      renderLoginScreen();
+      showToast('Signed out successfully', 'info');
+    }
+
+    function renderAuthenticatedApp() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('app-shell').classList.remove('hidden');
+      
+      const greetingEl = document.getElementById('user-greeting-text');
+      if (greetingEl) {
+        greetingEl.textContent = `Hello, ${currentUser.displayName || 'Lokesh Maurya'}`;
+      }
+      
+      lucide.createIcons();
+      refreshAll();
+    }
+
+    function renderLoginScreen() {
+      document.getElementById('app-shell').classList.add('hidden');
+      document.getElementById('login-view').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // DATA REFRESH & KPIS
+    // =========================================================================
     async function refreshAll() {
       const icon = document.getElementById('refreshIcon');
       if (icon) icon.classList.add('animate-spin');
@@ -823,9 +633,6 @@
       if (icon) icon.classList.remove('animate-spin');
     }
 
-    // =========================================================================
-    // STATS & KPIS
-    // =========================================================================
     async function loadStats() {
       try {
         const res = await fetch('/api/stats');
@@ -837,7 +644,9 @@
           
           const lowEl = document.getElementById('kpi-low');
           lowEl.textContent = data.inventory.low_stock_count;
-          lowEl.className = data.inventory.low_stock_count > 0 ? 'text-2xl font-bold font-mono text-amber-400 my-1' : 'text-2xl font-bold font-mono text-emerald-400 my-1';
+          lowEl.className = data.inventory.low_stock_count > 0 
+            ? 'text-2xl font-bold font-mono text-amber-600 my-1' 
+            : 'text-2xl font-bold font-mono text-emerald-600 my-1';
 
           document.getElementById('kpi-bugs').textContent = data.bugs.total_bugs;
           document.getElementById('badge-sku-count').textContent = data.inventory.total_skus;
@@ -884,9 +693,9 @@
       ['all', 'low', 'healthy', 'out'].forEach(s => {
         const btn = document.getElementById(`pill-${s}`);
         if (s.toUpperCase() === status) {
-          btn.className = 'px-2.5 py-1 rounded font-medium bg-blue-600 text-white transition';
+          btn.className = 'px-2.5 py-1 rounded font-medium bg-white text-emerald-700 shadow-xs transition';
         } else {
-          btn.className = 'px-2.5 py-1 rounded font-medium text-slate-400 hover:text-slate-200 transition';
+          btn.className = 'px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition';
         }
       });
       filterInventoryTable();
@@ -910,37 +719,37 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500">No items match your filter criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400">No items match your filter criteria.</td></tr>`;
         return;
       }
 
       filtered.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-800/40 transition group';
+        tr.className = 'hover:bg-slate-50/80 transition group';
 
         const statusBadge = item.badge === 'danger' 
-          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950/80 text-red-400 border border-red-900/50">Out of Stock</span>`
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Out of Stock</span>`
           : (item.badge === 'warning'
-            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950/80 text-amber-400 border border-amber-900/50">Low Stock</span>`
-            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-900/50">Healthy</span>`);
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Low Stock</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Healthy</span>`);
 
         tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold text-cyan-400">${item.sku}</td>
-          <td class="py-3 px-4 font-medium text-slate-200">${item.name}</td>
-          <td class="py-3 px-4 text-slate-400">${item.category}</td>
-          <td class="py-3 px-4 text-center font-mono font-bold ${item.quantity <= item.reorder_level ? 'text-amber-400' : 'text-slate-200'}">${item.quantity}</td>
-          <td class="py-3 px-4 text-right font-mono text-slate-300">₹ ${item.unit_price.toFixed(2)}</td>
-          <td class="py-3 px-4 text-right font-mono text-purple-300 font-semibold">₹ ${item.total_value.toFixed(2)}</td>
-          <td class="py-3 px-4 text-center font-mono text-slate-400">${item.reorder_level}</td>
+          <td class="py-3 px-4 font-mono font-bold text-emerald-700">${item.sku}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800">${item.name}</td>
+          <td class="py-3 px-4 text-slate-500">${item.category}</td>
+          <td class="py-3 px-4 text-center font-mono font-bold ${item.quantity <= item.reorder_level ? 'text-amber-600' : 'text-slate-700'}">${item.quantity}</td>
+          <td class="py-3 px-4 text-right font-mono text-slate-600">₹ ${item.unit_price.toFixed(2)}</td>
+          <td class="py-3 px-4 text-right font-mono text-slate-900 font-semibold">₹ ${item.total_value.toFixed(2)}</td>
+          <td class="py-3 px-4 text-center font-mono text-slate-500">${item.reorder_level}</td>
           <td class="py-3 px-4 text-center">${statusBadge}</td>
           <td class="py-3 px-4">
             <div class="flex items-center justify-center space-x-1.5">
-              <button onclick="adjustStock('${item.sku}', -1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold" title="Stock Out -1">-1</button>
-              <button onclick="adjustStock('${item.sku}', 1)" class="w-6 h-6 rounded bg-blue-950 hover:bg-blue-900 text-blue-300 flex items-center justify-center text-xs font-bold" title="Stock In +1">+1</button>
-              <button onclick="adjustStock('${item.sku}', 5)" class="w-6 h-6 rounded bg-blue-950 hover:bg-blue-900 text-blue-300 flex items-center justify-center text-xs font-bold" title="Stock In +5">+5</button>
-              <span class="text-slate-700">|</span>
-              <button onclick="openEditModal('${item.sku}')" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200" title="Edit Item Details"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
-              <button onclick="deleteItem('${item.sku}')" class="p-1 rounded hover:bg-red-950 text-slate-400 hover:text-red-400" title="Delete Item"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              <button onclick="adjustStock('${item.sku}', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold transition" title="Stock Out -1">-1</button>
+              <button onclick="adjustStock('${item.sku}', 1)" class="w-6 h-6 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold transition" title="Stock In +1">+1</button>
+              <button onclick="adjustStock('${item.sku}', 5)" class="w-6 h-6 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold transition" title="Stock In +5">+5</button>
+              <span class="text-slate-300">|</span>
+              <button onclick="openEditModal('${item.sku}')" class="p-1 rounded hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition" title="Edit Item Details"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+              <button onclick="deleteItem('${item.sku}')" class="p-1 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition" title="Delete Item"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </td>
         `;
@@ -986,7 +795,7 @@
     }
 
     // =========================================================================
-    // ADD & EDIT MODAL HANDLERS
+    // MODAL FORM SUBMISSIONS
     // =========================================================================
     function checkSkuLive() {
       const v = document.getElementById('add-sku').value.trim();
@@ -994,13 +803,13 @@
       const regex = /^SKU-[A-Z0-9]{3,8}$/;
       if (!v) {
         fb.textContent = "Format: 'SKU-XXXX' (3-8 alphanumeric)";
-        fb.className = "text-[10px] text-slate-500 mt-1 font-mono";
+        fb.className = "text-[10px] text-slate-400 mt-1 font-mono";
       } else if (regex.test(v)) {
         fb.textContent = "🟢 Poka-Yoke Verified: Valid SKU pattern";
-        fb.className = "text-[10px] text-emerald-400 mt-1 font-mono font-bold";
+        fb.className = "text-[10px] text-emerald-600 mt-1 font-mono font-bold";
       } else {
         fb.textContent = "🔴 Poka-Yoke Violation: Must match 'SKU-XXXX' (e.g. SKU-101)";
-        fb.className = "text-[10px] text-red-400 mt-1 font-mono font-bold";
+        fb.className = "text-[10px] text-rose-600 mt-1 font-mono font-bold";
       }
     }
 
@@ -1082,7 +891,7 @@
     }
 
     // =========================================================================
-    // BUG TRACKER (Q09) WORKSPACE
+    // DEFECT TRACKER (Q09) WORKSPACE
     // =========================================================================
     async function loadBugs() {
       try {
@@ -1114,39 +923,39 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500">No defect records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400">No defect records found.</td></tr>`;
         return;
       }
 
       filtered.forEach(b => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-800/40 transition';
+        tr.className = 'hover:bg-slate-50/80 transition';
 
         const sevBadge = b.severity >= 4
-          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950/80 text-red-400 border border-red-900/50">🔥 Sev ${b.severity}</span>`
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">🔥 Sev ${b.severity}</span>`
           : (b.severity === 3
-            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950/80 text-amber-400 border border-amber-900/50">⚠️ Sev ${b.severity}</span>`
-            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950/80 text-blue-400 border border-blue-900/50">⚡ Sev ${b.severity}</span>`);
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">⚠️ Sev ${b.severity}</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">⚡ Sev ${b.severity}</span>`);
 
         const statusBadge = b.status === 'Resolved'
-          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-900/50">Resolved ✅</span>`
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Resolved ✅</span>`
           : (b.status === 'In-Progress'
-            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950/80 text-blue-400 border border-blue-900/50">In-Progress 🛠️</span>`
-            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950/80 text-amber-400 border border-amber-900/50">Open ⏳</span>`);
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">In-Progress 🛠️</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Open ⏳</span>`);
 
         tr.innerHTML = `
-          <td class="py-3 px-4 text-center font-mono text-slate-400">#${b.id}</td>
-          <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${b.logged_at}</td>
-          <td class="py-3 px-4 font-mono text-cyan-400">${b.module}</td>
-          <td class="py-3 px-4 font-semibold text-slate-200">${b.defect_type}</td>
+          <td class="py-3 px-4 text-center font-mono text-slate-500">#${b.id}</td>
+          <td class="py-3 px-4 font-mono text-[11px] text-slate-500">${b.logged_at}</td>
+          <td class="py-3 px-4 font-mono text-emerald-700 font-semibold">${b.module}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800">${b.defect_type}</td>
           <td class="py-3 px-4 text-center">${sevBadge}</td>
           <td class="py-3 px-4 text-center">${statusBadge}</td>
-          <td class="py-3 px-4 text-slate-300 max-w-xs truncate" title="${b.description}">${b.description}</td>
+          <td class="py-3 px-4 text-slate-600 max-w-xs truncate" title="${b.description}">${b.description}</td>
           <td class="py-3 px-4 text-center">
             <div class="flex items-center justify-center space-x-1">
-              ${b.status !== 'In-Progress' ? `<button onclick="updateBugStatus(${b.id}, 'In-Progress')" class="px-2 py-1 rounded bg-blue-950 hover:bg-blue-900 text-blue-300 text-[10px] font-medium" title="Mark In-Progress">In-Prog</button>` : ''}
-              ${b.status !== 'Resolved' ? `<button onclick="updateBugStatus(${b.id}, 'Resolved')" class="px-2 py-1 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-300 text-[10px] font-medium" title="Mark Resolved">Resolve</button>` : ''}
-              ${b.status === 'Resolved' ? `<button onclick="updateBugStatus(${b.id}, 'Open')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-medium" title="Reopen">Reopen</button>` : ''}
+              ${b.status !== 'In-Progress' ? `<button onclick="updateBugStatus(${b.id}, 'In-Progress')" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 text-[10px] font-medium border border-blue-200" title="Mark In-Progress">In-Prog</button>` : ''}
+              ${b.status !== 'Resolved' ? `<button onclick="updateBugStatus(${b.id}, 'Resolved')" class="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-medium border border-emerald-200" title="Mark Resolved">Resolve</button>` : ''}
+              ${b.status === 'Resolved' ? `<button onclick="updateBugStatus(${b.id}, 'Open')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-medium border border-slate-200" title="Reopen">Reopen</button>` : ''}
             </div>
           </td>
         `;
@@ -1187,160 +996,6 @@
     }
 
     // =========================================================================
-    // SIMULATE POKA-YOKE DEFECT SANDBOX
-    // =========================================================================
-    async function simulateDefectPrompt() {
-      const type = prompt("Choose defect type to simulate:\n1. negative_qty (Quantity = -25)\n2. malformed_sku (SKU = INVALID_CODE_XYZ!)\n3. negative_price (Price = -450)\n4. underflow_stock (Deduct -99,999 units)\n\nEnter 1, 2, 3, or 4:", "1");
-      if (!type) return;
-
-      const map = {"1": "negative_qty", "2": "malformed_sku", "3": "negative_price", "4": "underflow_stock"};
-      const simType = map[type] || "negative_qty";
-
-      try {
-        const res = await fetch('/api/bugs/simulate', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({type: simType})
-        });
-        const data = await res.json();
-        alert(`⚡ POKA-YOKE TRAP ACTIVATED!\n\n1. Interception Message:\n${data.message}\n\n2. Software State: The application did NOT crash.\n3. Traceability: Defect recorded in SQLite & system_errors.log.\n\nNow opening the Q09 Defect Tracker.`);
-        switchView('bugs');
-        refreshAll();
-      } catch (err) {
-        showToast('Simulation failed', 'error');
-      }
-    }
-
-    // =========================================================================
-    // SQC ANALYTICS & CHARTS
-    // =========================================================================
-    function setAnalyticsSubTab(tab) {
-      ['pareto', 'fishbone', 'fmea', 'pdca'].forEach(t => {
-        document.getElementById(`subview-${t}`).classList.add('hidden');
-        const b = document.getElementById(`tab-${t}`);
-        b.className = 'px-4 py-2 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition';
-      });
-
-      document.getElementById(`subview-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = 'px-4 py-2 rounded-lg font-bold bg-blue-600 text-white transition';
-
-      if (tab === 'pareto') {
-        loadParetoChart();
-        loadDonutChart();
-      }
-    }
-
-    async function loadParetoChart() {
-      try {
-        const res = await fetch('/api/sqc/pareto');
-        const data = await res.json();
-        if (!data.success) return;
-
-        const ctx = document.getElementById('paretoCanvas').getContext('2d');
-        if (paretoChartInstance) paretoChartInstance.destroy();
-
-        paretoChartInstance = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: data.categories,
-            datasets: [
-              {
-                label: 'Defect Frequency (Count)',
-                data: data.counts,
-                backgroundColor: 'rgba(59, 130, 246, 0.75)',
-                borderColor: '#3b82f6',
-                borderWidth: 1.5,
-                yAxisID: 'y',
-                borderRadius: 4
-              },
-              {
-                label: 'Cumulative %',
-                data: data.cumulative_percentages,
-                type: 'line',
-                borderColor: '#f43f5e',
-                borderWidth: 2.5,
-                pointBackgroundColor: '#f43f5e',
-                pointRadius: 4,
-                yAxisID: 'y1'
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            scales: {
-              x: {
-                ticks: { color: '#94a3b8', font: { size: 10 } },
-                grid: { color: 'rgba(255, 255, 255, 0.05)' }
-              },
-              y: {
-                type: 'linear',
-                position: 'left',
-                ticks: { color: '#60a5fa' },
-                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                title: { display: true, text: 'Defect Count', color: '#60a5fa', font: { size: 11, weight: 'bold' } }
-              },
-              y1: {
-                type: 'linear',
-                position: 'right',
-                min: 0,
-                max: 110,
-                ticks: { color: '#fda4af' },
-                grid: { drawOnChartArea: false },
-                title: { display: true, text: 'Cumulative %', color: '#fda4af', font: { size: 11, weight: 'bold' } }
-              }
-            },
-            plugins: {
-              legend: { labels: { color: '#cbd5e1', font: { size: 11 } } },
-              tooltip: {
-                callbacks: {
-                  afterBody: (items) => {
-                    const idx = items[0].dataIndex;
-                    return data.cumulative_percentages[idx] <= 80 ? '🎯 VITAL FEW (80% Zone)' : '';
-                  }
-                }
-              }
-            }
-          }
-        });
-      } catch (err) {
-        console.error('Failed to render Pareto chart:', err);
-      }
-    }
-
-    function loadDonutChart() {
-      const catCounts = {};
-      inventoryData.forEach(i => {
-        catCounts[i.category] = (catCounts[i.category] || 0) + i.quantity;
-      });
-
-      const labels = Object.keys(catCounts);
-      const values = Object.values(catCounts);
-      const ctx = document.getElementById('categoryDonutCanvas').getContext('2d');
-      if (donutChartInstance) donutChartInstance.destroy();
-
-      donutChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: values,
-            backgroundColor: ['#00f0ff', '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'right', labels: { color: '#cbd5e1', font: { size: 9 }, boxWidth: 10 } }
-          }
-        }
-      });
-    }
-
-    // =========================================================================
     // SYSTEM AUDIT CONSOLE
     // =========================================================================
     async function loadLogs() {
@@ -1352,8 +1007,8 @@
           el.innerHTML = '';
           data.logs.forEach(l => {
             const row = document.createElement('div');
-            if (l.includes('[ERROR]')) row.className = 'text-red-400 font-medium';
-            else if (l.includes('[INFO]')) row.className = 'text-cyan-400';
+            if (l.includes('[ERROR]')) row.className = 'text-rose-400 font-medium';
+            else if (l.includes('[INFO]')) row.className = 'text-emerald-400';
             else row.className = 'text-slate-300';
             row.textContent = l;
             el.appendChild(row);
@@ -1385,36 +1040,36 @@
     // NAVIGATION SWITCHER
     // =========================================================================
     function switchView(viewName) {
-      ['inventory', 'bugs', 'analytics', 'logs', 'knowledge'].forEach(v => {
-        document.getElementById(`view-${v}`).classList.add('hidden');
+      ['inventory', 'bugs', 'logs'].forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        if (viewEl) viewEl.classList.add('hidden');
         const btn = document.getElementById(`nav-${v}`);
-        btn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition group';
+        if (btn) btn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition group';
       });
 
-      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+      const activeView = document.getElementById(`view-${viewName}`);
+      if (activeView) activeView.classList.remove('hidden');
       const activeBtn = document.getElementById(`nav-${viewName}`);
-      activeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold bg-blue-600/10 text-cyan-400 border border-blue-500/20 transition group';
+      if (activeBtn) activeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 transition group';
 
-      if (viewName === 'analytics') {
-        setAnalyticsSubTab('pareto');
-      } else if (viewName === 'logs') {
+      if (viewName === 'logs') {
         loadLogs();
       }
     }
 
-    // Modal helpers
+    // Modal Helpers
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-    // Toast Notification helper
+    // Toast Notifications
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       const colorClass = type === 'success' 
-        ? 'bg-emerald-950/90 text-emerald-300 border-emerald-800' 
-        : (type === 'error' ? 'bg-red-950/90 text-red-300 border-red-800' : 'bg-slate-900/90 text-slate-200 border-slate-700');
+        ? 'bg-emerald-600 text-white shadow-emerald-600/30' 
+        : (type === 'error' ? 'bg-rose-600 text-white shadow-rose-600/30' : 'bg-slate-800 text-white shadow-slate-800/30');
 
-      toast.className = `px-4 py-2.5 rounded-xl border shadow-xl text-xs flex items-center space-x-2 pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0 ${colorClass}`;
+      toast.className = `px-4 py-2.5 rounded-xl border border-white/10 shadow-lg text-xs flex items-center space-x-2 pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0 ${colorClass}`;
       toast.innerHTML = `<span>${message}</span>`;
       container.appendChild(toast);
 

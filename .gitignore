@@ -7,10 +7,11 @@ __pycache__/
 *.db
 *.sqlite3
 
-# Logs (Ignore other logs, but keep system_errors.log for TQM evaluation)
+# Logs (Ignore other logs, but keep system_errors.log for evaluation)
 *.log
 !logs/system_errors.log
 !logs/.gitkeep
+logs/browser_profile/
 
 # Virtual Environments
 venv/
