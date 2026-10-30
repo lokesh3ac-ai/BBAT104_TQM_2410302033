@@ -91,7 +91,10 @@
           <div class="relative">
             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
             <input type="password" id="login-password" value="" placeholder="Enter your password" required autocomplete="new-password"
-              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
+              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
+            <button type="button" onclick="togglePasswordVisibility('login-password', 'login-pass-icon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 focus:outline-none transition" title="Show/Hide password">
+              <i data-lucide="eye" id="login-pass-icon" class="w-4 h-4"></i>
+            </button>
           </div>
         </div>
 
@@ -131,7 +134,10 @@
             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
             <input type="password" id="reg-password" value="" placeholder="Create a strong password" required autocomplete="new-password"
               oninput="handlePasswordInput(this.value)"
-              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
+              class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
+            <button type="button" onclick="togglePasswordVisibility('reg-password', 'reg-pass-icon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 focus:outline-none transition" title="Show/Hide password">
+              <i data-lucide="eye" id="reg-pass-icon" class="w-4 h-4"></i>
+            </button>
           </div>
           
           <!-- Strict Password Complexity Rule Indicators -->
@@ -315,56 +321,76 @@
           </button>
         </div>
 
-        <!-- KPI METRIC RIBBON -->
+        <!-- KPI METRIC RIBBON (INTERACTIVE DEEP LINKS) -->
         <section class="grid grid-cols-2 md:grid-cols-5 gap-3.5 shrink-0">
           <!-- Card 1: Total SKUs -->
-          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-emerald-300 transition">
+          <div onclick="kpiFilterReset()" title="Click to view all catalog items"
+            class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-emerald-400 hover:shadow-md hover:scale-[1.01] cursor-pointer transition duration-150 active:scale-[0.99] group select-none">
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>TOTAL SKUs</span>
-              <i data-lucide="box" class="w-4 h-4 text-emerald-600"></i>
+              <span class="group-hover:text-emerald-600 transition">TOTAL SKUs</span>
+              <i data-lucide="box" class="w-4 h-4 text-emerald-600 group-hover:scale-110 transition"></i>
             </div>
             <div class="text-2xl font-bold font-mono text-slate-900 dark:text-white my-1" id="kpi-skus">0</div>
-            <div class="text-[11px] text-slate-400">Active Catalog Items</div>
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Active Catalog Items</span>
+              <span class="text-emerald-600 opacity-0 group-hover:opacity-100 transition text-[10px] font-semibold">View all →</span>
+            </div>
           </div>
 
           <!-- Card 2: Total Units -->
-          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-blue-300 transition">
+          <div onclick="kpiFilterReset()" title="Click to view all stock inventory"
+            class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-blue-400 hover:shadow-md hover:scale-[1.01] cursor-pointer transition duration-150 active:scale-[0.99] group select-none">
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>TOTAL STOCK</span>
-              <i data-lucide="layers" class="w-4 h-4 text-blue-600"></i>
+              <span class="group-hover:text-blue-600 transition">TOTAL STOCK</span>
+              <i data-lucide="layers" class="w-4 h-4 text-blue-600 group-hover:scale-110 transition"></i>
             </div>
             <div class="text-2xl font-bold font-mono text-blue-700 dark:text-blue-400 my-1" id="kpi-units">0</div>
-            <div class="text-[11px] text-slate-400">Warehouse Units</div>
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Warehouse Units</span>
+              <span class="text-blue-600 opacity-0 group-hover:opacity-100 transition text-[10px] font-semibold">View all →</span>
+            </div>
           </div>
 
           <!-- Card 3: Asset Valuation -->
-          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-purple-300 transition">
+          <div onclick="kpiFilterReset()" title="Click to view valuation details"
+            class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-purple-400 hover:shadow-md hover:scale-[1.01] cursor-pointer transition duration-150 active:scale-[0.99] group select-none">
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>VALUATION</span>
-              <i data-lucide="indian-rupee" class="w-4 h-4 text-purple-600"></i>
+              <span class="group-hover:text-purple-600 transition">VALUATION</span>
+              <i data-lucide="indian-rupee" class="w-4 h-4 text-purple-600 group-hover:scale-110 transition"></i>
             </div>
             <div class="text-2xl font-bold font-mono text-purple-700 dark:text-purple-400 my-1 truncate" id="kpi-val">₹ 0.00</div>
-            <div class="text-[11px] text-slate-400">Inventory Asset Worth</div>
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Inventory Asset Worth</span>
+              <span class="text-purple-600 opacity-0 group-hover:opacity-100 transition text-[10px] font-semibold">View all →</span>
+            </div>
           </div>
 
           <!-- Card 4: Low Stock Alerts -->
-          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-amber-300 transition">
+          <div onclick="kpiFilterLowStock()" title="Click to filter Low Stock items immediately"
+            class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-amber-400 hover:shadow-md hover:scale-[1.01] cursor-pointer transition duration-150 active:scale-[0.99] group select-none">
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>LOW STOCK</span>
-              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+              <span class="group-hover:text-amber-600 transition">LOW STOCK</span>
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500 group-hover:scale-110 transition"></i>
             </div>
             <div class="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 my-1" id="kpi-low">0</div>
-            <div class="text-[11px] text-slate-400">≤ Reorder Threshold</div>
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>≤ Reorder Threshold</span>
+              <span class="text-amber-600 opacity-0 group-hover:opacity-100 transition text-[10px] font-semibold">Filter now ⚡</span>
+            </div>
           </div>
 
           <!-- Card 5: Trapped Defects -->
-          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-rose-300 transition">
+          <div onclick="switchView('bugs')" title="Click to navigate to Defect Tracker"
+            class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-rose-400 hover:shadow-md hover:scale-[1.01] cursor-pointer transition duration-150 active:scale-[0.99] group select-none">
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>TRAPPED BUGS</span>
-              <i data-lucide="bug" class="w-4 h-4 text-rose-500"></i>
+              <span class="group-hover:text-rose-600 transition">TRAPPED BUGS</span>
+              <i data-lucide="bug" class="w-4 h-4 text-rose-500 group-hover:scale-110 transition"></i>
             </div>
             <div class="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400 my-1" id="kpi-bugs">0</div>
-            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">100% Intercepted</div>
+            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center justify-between">
+              <span>100% Intercepted</span>
+              <span class="text-rose-600 opacity-0 group-hover:opacity-100 transition text-[10px] font-semibold">Open Tracker →</span>
+            </div>
           </div>
         </section>
 
@@ -1006,6 +1032,32 @@
       updateRuleIndicator('rule-special', false);
     }
 
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (!input) return;
+
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+
+      if (icon) {
+        icon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+        lucide.createIcons();
+      }
+    }
+
+    function resetPasswordVisibility() {
+      const lp = document.getElementById('login-password');
+      const rp = document.getElementById('reg-password');
+      if (lp) lp.type = 'password';
+      if (rp) rp.type = 'password';
+      const lIcon = document.getElementById('login-pass-icon');
+      const rIcon = document.getElementById('reg-pass-icon');
+      if (lIcon) lIcon.setAttribute('data-lucide', 'eye');
+      if (rIcon) rIcon.setAttribute('data-lucide', 'eye');
+      lucide.createIcons();
+    }
+
     function setAuthTab(tab) {
       const isLogin = tab === 'login';
       document.getElementById('form-login').classList.toggle('hidden', !isLogin);
@@ -1027,6 +1079,7 @@
       document.getElementById('reg-store-name').value = '';
       document.getElementById('reg-owner-name').value = '';
 
+      resetPasswordVisibility();
       clearAuthErrors();
     }
 
@@ -1238,6 +1291,7 @@
       if (rem) rem.checked = false;
 
       clearAuthErrors();
+      resetPasswordVisibility();
       setAuthTab('login');
       lucide.createIcons();
     }
@@ -1346,15 +1400,65 @@
     }
 
     // =========================================================================
-    // DATA REFRESH & KPIS
+    // DATA REFRESH, REAL-TIME KPIS & DEEP LINKS
     // =========================================================================
+    function kpiFilterReset() {
+      switchView('inventory');
+      const searchInput = document.getElementById('inv-search');
+      if (searchInput) searchInput.value = '';
+      const catFilter = document.getElementById('inv-cat-filter');
+      if (catFilter) catFilter.value = 'ALL';
+      setStockStatusFilter('ALL');
+      filterInventoryTable();
+      showToast('Showing all catalog items', 'info');
+    }
+
+    function kpiFilterLowStock() {
+      switchView('inventory');
+      const searchInput = document.getElementById('inv-search');
+      if (searchInput) searchInput.value = '';
+      const catFilter = document.getElementById('inv-cat-filter');
+      if (catFilter) catFilter.value = 'ALL';
+      setStockStatusFilter('LOW');
+      filterInventoryTable();
+      showToast('Filtered: Critical Low Stock Items', 'warning');
+    }
+
+    // Instantly calculate and update all top KPI summary cards from local state
+    function updateKPICards() {
+      const totalSkus = inventoryData.length;
+      const totalUnits = inventoryData.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);
+      const totalValuation = inventoryData.reduce((acc, item) => acc + ((Number(item.quantity) || 0) * (Number(item.unit_price) || 0)), 0);
+      const lowStockCount = inventoryData.filter(item => (Number(item.quantity) || 0) <= (Number(item.reorder_level) || 0)).length;
+
+      const skuEl = document.getElementById('kpi-skus');
+      if (skuEl) skuEl.textContent = totalSkus;
+
+      const unitsEl = document.getElementById('kpi-units');
+      if (unitsEl) unitsEl.textContent = totalUnits.toLocaleString();
+
+      const valEl = document.getElementById('kpi-val');
+      if (valEl) valEl.textContent = '₹ ' + totalValuation.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+      const lowEl = document.getElementById('kpi-low');
+      if (lowEl) {
+        lowEl.textContent = lowStockCount;
+        lowEl.className = lowStockCount > 0 
+          ? 'text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 my-1' 
+          : 'text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 my-1';
+      }
+
+      const badgeSku = document.getElementById('badge-sku-count');
+      if (badgeSku) badgeSku.textContent = totalSkus;
+    }
+
     async function refreshAll() {
       const icon = document.getElementById('refreshIcon');
       if (icon) icon.classList.add('animate-spin');
 
       await Promise.all([
-        loadStats(),
         loadInventory(),
+        loadStats(),
         loadBugs(),
         loadLogs()
       ]);
@@ -1364,7 +1468,8 @@
 
     async function loadStats() {
       try {
-        const res = await fetch('/api/stats');
+        const query = currentUser ? `?user_id=${currentUser.id}` : '';
+        const res = await fetch(`/api/stats${query}`);
         const data = await res.json();
         if (data.success) {
           document.getElementById('kpi-skus').textContent = data.inventory.total_skus;
@@ -1391,10 +1496,12 @@
     // =========================================================================
     async function loadInventory() {
       try {
-        const res = await fetch('/api/inventory');
+        const query = currentUser ? `?user_id=${currentUser.id}` : '';
+        const res = await fetch(`/api/inventory${query}`);
         const data = await res.json();
         if (data.success) {
           inventoryData = data.items;
+          updateKPICards();
           populateCategoryFilter();
           filterInventoryTable();
         }
@@ -1421,6 +1528,7 @@
       activeStockStatusFilter = status;
       ['all', 'low', 'healthy', 'out'].forEach(s => {
         const btn = document.getElementById(`pill-${s}`);
+        if (!btn) return;
         if (s.toUpperCase() === status) {
           btn.className = 'px-2.5 py-1 rounded font-medium bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs transition';
         } else {
@@ -1436,6 +1544,29 @@
       const tbody = document.getElementById('inventory-table-body');
       tbody.innerHTML = '';
 
+      // Clean empty state for new accounts with no items
+      if (inventoryData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="py-16 text-center">
+              <div class="max-w-md mx-auto flex flex-col items-center justify-center space-y-3">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm">
+                  <i data-lucide="package-plus" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-800 dark:text-white">Add items to your store</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xs">Your store catalog is currently empty. Get started by adding your first verified inventory SKU.</p>
+                <button onclick="openModal('addModal')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-md shadow-emerald-600/20 active:scale-[0.99] mt-2">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span>+ Add Verified Item</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
       const filtered = inventoryData.filter(item => {
         const matchSearch = item.sku.toLowerCase().includes(search) || item.name.toLowerCase().includes(search) || item.category.toLowerCase().includes(search);
         const matchCat = cat === 'ALL' || item.category === cat;
@@ -1448,7 +1579,7 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400">No items match your filter criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="py-10 text-center text-xs text-slate-400">No items match your filter criteria.</td></tr>`;
         return;
       }
 
@@ -1475,9 +1606,9 @@
           <td class="py-3 px-4 text-center">${statusBadge}</td>
           <td class="py-3 px-4" onclick="event.stopPropagation()">
             <div class="flex items-center justify-center space-x-1.5">
-              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', -1)" class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 flex items-center justify-center text-xs font-bold transition" title="Stock Out -1">-1</button>
-              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 1)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition" title="Stock In +1">+1</button>
-              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 5)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition" title="Stock In +5">+5</button>
+              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', -1)" class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock Out -1">-1</button>
+              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 1)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock In +1">+1</button>
+              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 5)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock In +5">+5</button>
               <span class="text-slate-300 dark:text-slate-700">|</span>
               <button onclick="event.stopPropagation(); openEditModal('${item.sku}')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition" title="Edit Item Details"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
               <button onclick="event.stopPropagation(); deleteItem('${item.sku}')" class="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950 text-slate-400 hover:text-rose-600 transition" title="Delete Item"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
@@ -1525,7 +1656,7 @@
       setTimeout(() => {
         const updated = inventoryData.find(i => i.sku === selectedDetailItem.sku);
         if (updated) openItemDetailDrawer(updated.sku);
-      }, 300);
+      }, 100);
     }
 
     function editFromDetailDrawer() {
@@ -1541,37 +1672,85 @@
     }
 
     async function adjustStock(sku, delta) {
+      // Optimistic instant UI reactivity
+      const targetItem = inventoryData.find(i => i.sku === sku);
+      let previousQty = 0;
+      if (targetItem) {
+        previousQty = targetItem.quantity;
+        const nextQty = targetItem.quantity + delta;
+        if (nextQty < 0) {
+          showToast(`Insufficient stock. Current: ${targetItem.quantity}, Deduction: ${Math.abs(delta)}`, 'error');
+          return;
+        }
+        targetItem.quantity = nextQty;
+        targetItem.total_value = targetItem.quantity * targetItem.unit_price;
+        if (targetItem.quantity === 0) {
+          targetItem.status = "Out of Stock";
+          targetItem.badge = "danger";
+        } else if (targetItem.quantity <= targetItem.reorder_level) {
+          targetItem.status = "Low Stock";
+          targetItem.badge = "warning";
+        } else {
+          targetItem.status = "Healthy";
+          targetItem.badge = "success";
+        }
+        updateKPICards();
+        filterInventoryTable();
+      }
+
       try {
         const res = await fetch('/api/inventory/stock', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({sku, delta})
+          body: JSON.stringify({sku, delta, user_id: currentUser ? currentUser.id : null})
         });
         const data = await res.json();
         if (data.success) {
           showToast(`Stock updated for ${sku} (${delta > 0 ? '+' : ''}${delta})`, 'success');
-          refreshAll();
+          await Promise.all([loadInventory(), loadStats()]);
         } else {
+          // Revert optimistic update on failure
+          if (targetItem) {
+            targetItem.quantity = previousQty;
+            targetItem.total_value = targetItem.quantity * targetItem.unit_price;
+            updateKPICards();
+            filterInventoryTable();
+          }
           showToast(`Poka-Yoke Trap: ${data.message}`, 'error');
-          refreshAll();
+          await Promise.all([loadInventory(), loadStats()]);
         }
       } catch (err) {
         showToast('Connection error', 'error');
+        await loadInventory();
       }
     }
 
     async function deleteItem(sku) {
       if (!confirm(`Are you sure you want to delete item ${sku}?`)) return;
+
+      // Optimistic removal from local state
+      const prevData = [...inventoryData];
+      inventoryData = inventoryData.filter(i => i.sku !== sku);
+      updateKPICards();
+      filterInventoryTable();
+
       try {
-        const res = await fetch(`/api/inventory/delete/${sku}`, {method: 'DELETE'});
+        const query = currentUser ? `?user_id=${currentUser.id}` : '';
+        const res = await fetch(`/api/inventory/delete/${sku}${query}`, {method: 'DELETE'});
         const data = await res.json();
         if (data.success) {
           showToast(data.message, 'success');
-          refreshAll();
+          await Promise.all([loadInventory(), loadStats()]);
         } else {
+          inventoryData = prevData;
+          updateKPICards();
+          filterInventoryTable();
           showToast(data.message, 'error');
         }
       } catch (err) {
+        inventoryData = prevData;
+        updateKPICards();
+        filterInventoryTable();
         showToast('Failed to delete item', 'error');
       }
     }
@@ -1603,7 +1782,8 @@
         category: document.getElementById('add-cat').value,
         quantity: document.getElementById('add-qty').value,
         unit_price: document.getElementById('add-price').value,
-        reorder_level: document.getElementById('add-reorder').value
+        reorder_level: document.getElementById('add-reorder').value,
+        user_id: currentUser ? currentUser.id : null
       };
 
       try {
@@ -1621,10 +1801,10 @@
           document.getElementById('add-cat').value = '';
           document.getElementById('add-qty').value = '';
           document.getElementById('add-price').value = '';
-          refreshAll();
+          await refreshAll();
         } else {
           showToast(`Poka-Yoke Rejection: ${data.message}`, 'error');
-          refreshAll();
+          await refreshAll();
         }
       } catch (err) {
         showToast('Network error adding item', 'error');
@@ -1650,7 +1830,8 @@
         name: document.getElementById('edit-name').value,
         category: document.getElementById('edit-cat').value,
         unit_price: document.getElementById('edit-price').value,
-        reorder_level: document.getElementById('edit-reorder').value
+        reorder_level: document.getElementById('edit-reorder').value,
+        user_id: currentUser ? currentUser.id : null
       };
 
       try {
@@ -1663,7 +1844,7 @@
         if (data.success) {
           showToast(`Item ${payload.sku} updated successfully!`, 'success');
           closeModal('editModal');
-          refreshAll();
+          await refreshAll();
         } else {
           showToast(`Update rejected: ${data.message}`, 'error');
         }
@@ -1815,7 +1996,8 @@
     }
 
     function exportCSV() {
-      window.location.href = '/api/export/csv';
+      const query = currentUser ? `?user_id=${currentUser.id}` : '';
+      window.location.href = `/api/export/csv${query}`;
     }
 
     // =========================================================================

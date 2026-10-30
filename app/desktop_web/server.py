@@ -151,9 +151,28 @@ def api_delete_account():
 # =============================================================================
 # INVENTORY REST APIS
 # =============================================================================
+def get_request_user_id():
+    """Extracts user_id from session or request query/body."""
+    user = session.get("user")
+    if user and user.get("id"):
+        return user.get("id")
+    if request.is_json and request.json and "user_id" in request.json:
+        try:
+            return int(request.json.get("user_id"))
+        except (ValueError, TypeError):
+            pass
+    if request.args.get("user_id"):
+        try:
+            return int(request.args.get("user_id"))
+        except (ValueError, TypeError):
+            pass
+    return None
+
+
 @app.route("/api/inventory", methods=["GET"])
 def api_get_inventory():
-    items = get_all_items()
+    user_id = get_request_user_id()
+    items = get_all_items(user_id=user_id)
     result = []
     for item in items:
         item_id, sku, name, cat, qty, price, reorder, created = item
@@ -194,8 +213,9 @@ def api_add_item():
     quantity = data.get("quantity", "0")
     unit_price = data.get("unit_price", "0")
     reorder_level = data.get("reorder_level", "5")
+    user_id = get_request_user_id()
 
-    success, msg = add_item(sku, name, category, quantity, unit_price, reorder_level)
+    success, msg = add_item(sku, name, category, quantity, unit_price, reorder_level, user_id=user_id)
     return jsonify({"success": success, "message": msg}), (200 if success else 400)
 
 
@@ -203,12 +223,13 @@ def api_add_item():
 def api_update_stock():
     data = request.json or {}
     sku = data.get("sku", "")
+    user_id = get_request_user_id()
     try:
         delta = int(data.get("delta", 0))
     except (ValueError, TypeError):
         return jsonify({"success": False, "message": "Delta adjustment must be an integer."}), 400
 
-    success, msg = update_stock(sku, delta)
+    success, msg = update_stock(sku, delta, user_id=user_id)
     return jsonify({"success": success, "message": msg}), (200 if success else 400)
 
 
@@ -220,20 +241,23 @@ def api_update_item():
     category = data.get("category", "")
     unit_price = data.get("unit_price", "0")
     reorder_level = data.get("reorder_level", "5")
+    user_id = get_request_user_id()
 
-    success, msg = update_item_details(sku, name, category, unit_price, reorder_level)
+    success, msg = update_item_details(sku, name, category, unit_price, reorder_level, user_id=user_id)
     return jsonify({"success": success, "message": msg}), (200 if success else 400)
 
 
 @app.route("/api/inventory/delete/<sku>", methods=["DELETE"])
 def api_delete_item(sku):
-    success, msg = delete_item(sku)
+    user_id = get_request_user_id()
+    success, msg = delete_item(sku, user_id=user_id)
     return jsonify({"success": success, "message": msg}), (200 if success else 400)
 
 
 @app.route("/api/categories", methods=["GET"])
 def api_get_categories():
-    cats = get_all_categories()
+    user_id = get_request_user_id()
+    cats = get_all_categories(user_id=user_id)
     return jsonify({"success": True, "categories": cats})
 
 
@@ -288,7 +312,8 @@ def api_clear_resolved_bugs():
 # =============================================================================
 @app.route("/api/stats", methods=["GET"])
 def api_get_stats():
-    inv_stats = get_inventory_statistics()
+    user_id = get_request_user_id()
+    inv_stats = get_inventory_statistics(user_id=user_id)
     bug_stats = get_bug_statistics()
     return jsonify({
         "success": True,
@@ -325,7 +350,8 @@ def api_clear_logs():
 
 @app.route("/api/export/csv", methods=["GET"])
 def api_export_csv():
-    items = get_all_items()
+    user_id = get_request_user_id()
+    items = get_all_items(user_id=user_id)
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(["Item ID", "SKU", "Item Name", "Category", "Quantity", "Unit Price", "Total Value", "Reorder Level", "Created At"])

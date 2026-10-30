@@ -49,8 +49,8 @@ def validate_item_data(sku: str, name: str, category: str, quantity: str, unit_p
     return sku, name, category, qty, price, reorder
 
 
-def add_item(sku, name, category, quantity, unit_price, reorder_level="5"):
-    """Adds a new inventory item with strict exception handling and logging."""
+def add_item(sku, name, category, quantity, unit_price, reorder_level="5", user_id=None):
+    """Adds a new inventory item with strict exception handling and user scoping."""
     conn = None
     try:
         v_sku, v_name, v_cat, v_qty, v_price, v_reorder = validate_item_data(
@@ -60,10 +60,10 @@ def add_item(sku, name, category, quantity, unit_price, reorder_level="5"):
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO items (sku, name, category, quantity, unit_price, reorder_level)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO items (user_id, sku, name, category, quantity, unit_price, reorder_level)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (v_sku, v_name, v_cat, v_qty, v_price, v_reorder),
+            (user_id, v_sku, v_name, v_cat, v_qty, v_price, v_reorder),
         )
         conn.commit()
         return True, "Item added successfully."
@@ -105,12 +105,20 @@ def add_item(sku, name, category, quantity, unit_price, reorder_level="5"):
                 pass
 
 
-def get_all_items():
-    """Fetches all inventory items."""
+def get_all_items(user_id=None):
+    """Fetches inventory items scoped to user_id, or all items if user_id is None."""
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT item_id, sku, name, category, quantity, unit_price, reorder_level, created_at FROM items ORDER BY item_id DESC")
+        if user_id is not None:
+            cursor.execute(
+                "SELECT item_id, sku, name, category, quantity, unit_price, reorder_level, created_at FROM items WHERE user_id = ? ORDER BY item_id DESC",
+                (user_id,)
+            )
+        else:
+            cursor.execute(
+                "SELECT item_id, sku, name, category, quantity, unit_price, reorder_level, created_at FROM items ORDER BY item_id DESC"
+            )
         rows = cursor.fetchall()
         conn.close()
         return rows
@@ -119,17 +127,23 @@ def get_all_items():
         return []
 
 
-def delete_item(identifier):
-    """Safely deletes an item by SKU or numeric item_id."""
+def delete_item(identifier, user_id=None):
+    """Safely deletes an item by SKU or numeric item_id, scoped to user_id if provided."""
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
         id_str = str(identifier).strip()
-        if id_str.isdigit():
-            cursor.execute("DELETE FROM items WHERE item_id = ? OR sku = ?", (int(id_str), id_str))
+        if user_id is not None:
+            if id_str.isdigit():
+                cursor.execute("DELETE FROM items WHERE (item_id = ? OR sku = ?) AND user_id = ?", (int(id_str), id_str, user_id))
+            else:
+                cursor.execute("DELETE FROM items WHERE sku = ? AND user_id = ?", (id_str, user_id))
         else:
-            cursor.execute("DELETE FROM items WHERE sku = ?", (id_str,))
+            if id_str.isdigit():
+                cursor.execute("DELETE FROM items WHERE item_id = ? OR sku = ?", (int(id_str), id_str))
+            else:
+                cursor.execute("DELETE FROM items WHERE sku = ?", (id_str,))
         
         conn.commit()
         if cursor.rowcount == 0:
@@ -147,13 +161,16 @@ def delete_item(identifier):
                 pass
 
 
-def update_stock(sku: str, delta: int):
+def update_stock(sku: str, delta: int, user_id=None):
     """Adjusts stock levels (Stock In / Stock Out) with lower bound Poka-Yoke check."""
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT quantity FROM items WHERE sku = ?", (sku,))
+        if user_id is not None:
+            cursor.execute("SELECT quantity FROM items WHERE sku = ? AND user_id = ?", (sku, user_id))
+        else:
+            cursor.execute("SELECT quantity FROM items WHERE sku = ?", (sku,))
         row = cursor.fetchone()
         if not row:
             return False, "Item not found."
@@ -163,7 +180,10 @@ def update_stock(sku: str, delta: int):
         if new_qty < 0:
             raise ValueError(f"Insufficient stock. Available: {current_qty}, Requested deduction: {abs(delta)}")
 
-        cursor.execute("UPDATE items SET quantity = ? WHERE sku = ?", (new_qty, sku))
+        if user_id is not None:
+            cursor.execute("UPDATE items SET quantity = ? WHERE sku = ? AND user_id = ?", (new_qty, sku, user_id))
+        else:
+            cursor.execute("UPDATE items SET quantity = ? WHERE sku = ?", (new_qty, sku))
         conn.commit()
         return True, f"Stock updated. New Quantity: {new_qty}"
     except ValueError as ve:
@@ -196,8 +216,8 @@ def update_stock(sku: str, delta: int):
                 pass
 
 
-def update_item_details(sku: str, name: str, category: str, unit_price: str, reorder_level: str):
-    """Updates non-stock attributes of an existing item with validation."""
+def update_item_details(sku: str, name: str, category: str, unit_price: str, reorder_level: str, user_id=None):
+    """Updates non-stock attributes of an existing item with validation, scoped to user_id."""
     conn = None
     try:
         # Validate input parameters
@@ -224,14 +244,24 @@ def update_item_details(sku: str, name: str, category: str, unit_price: str, reo
 
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            """
-            UPDATE items
-            SET name = ?, category = ?, unit_price = ?, reorder_level = ?
-            WHERE sku = ?
-            """,
-            (name, category, price, reorder, sku)
-        )
+        if user_id is not None:
+            cursor.execute(
+                """
+                UPDATE items
+                SET name = ?, category = ?, unit_price = ?, reorder_level = ?
+                WHERE sku = ? AND user_id = ?
+                """,
+                (name, category, price, reorder, sku, user_id)
+            )
+        else:
+            cursor.execute(
+                """
+                UPDATE items
+                SET name = ?, category = ?, unit_price = ?, reorder_level = ?
+                WHERE sku = ?
+                """,
+                (name, category, price, reorder, sku)
+            )
         conn.commit()
         if cursor.rowcount == 0:
             return False, f"Item with SKU '{sku}' not found."
@@ -266,25 +296,29 @@ def update_item_details(sku: str, name: str, category: str, unit_price: str, reo
                 pass
 
 
-def get_all_categories():
-    """Returns list of distinct categories present in inventory."""
+def get_all_categories(user_id=None):
+    """Returns list of distinct categories present in inventory for user_id."""
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT DISTINCT category FROM items ORDER BY category ASC")
+        if user_id is not None:
+            cursor.execute("SELECT DISTINCT category FROM items WHERE user_id = ? ORDER BY category ASC", (user_id,))
+        else:
+            cursor.execute("SELECT DISTINCT category FROM items ORDER BY category ASC")
         rows = cursor.fetchall()
         conn.close()
-        return [r[0] for r in rows if r[0]]
+        distinct = [r[0] for r in rows if r[0]]
+        return distinct if distinct else ["Peripherals", "Display", "Electronics", "Accessories"]
     except Exception:
         return ["Peripherals", "Display", "Electronics", "Accessories"]
 
 
-def get_inventory_statistics():
-    """Computes high-level KPI metrics for the inventory dashboard."""
+def get_inventory_statistics(user_id=None):
+    """Computes high-level KPI metrics for the inventory dashboard, optionally filtered by user_id."""
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("""
+        query = """
             SELECT 
                 COUNT(*) as total_skus,
                 COALESCE(SUM(quantity), 0) as total_units,
@@ -292,7 +326,12 @@ def get_inventory_statistics():
                 COALESCE(SUM(CASE WHEN quantity <= reorder_level THEN 1 ELSE 0 END), 0) as low_stock_count,
                 COALESCE(SUM(CASE WHEN quantity = 0 THEN 1 ELSE 0 END), 0) as out_of_stock_count
             FROM items
-        """)
+        """
+        if user_id is not None:
+            query += " WHERE user_id = ?"
+            cursor.execute(query, (user_id,))
+        else:
+            cursor.execute(query)
         row = cursor.fetchone()
         conn.close()
         return {
