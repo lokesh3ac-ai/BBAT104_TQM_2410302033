@@ -41,6 +41,25 @@
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     .dark ::-webkit-scrollbar-thumb { background: #334155; }
     .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printable-receipt-area, #printable-receipt-area * {
+        visibility: visible;
+      }
+      #printable-receipt-area {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        background: white;
+        color: black;
+      }
+    }
   </style>
 </head>
 <body class="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased h-screen overflow-hidden flex flex-col select-none transition-colors duration-200">
@@ -57,7 +76,7 @@
           <i data-lucide="boxes" class="w-6 h-6"></i>
         </div>
         <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">INVENTORY MANAGEMENT SYSTEM</h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400">Enterprise Stock & Defect Tracking Platform</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Multi-Role Stock, POS Billing & Audit Governance</p>
       </div>
 
       <!-- Auth Tabs: Login vs Sign Up -->
@@ -66,7 +85,7 @@
           Sign In
         </button>
         <button type="button" onclick="setAuthTab('register')" id="tab-auth-register" class="flex-1 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
-          Create Account
+          Register Store
         </button>
       </div>
 
@@ -79,7 +98,7 @@
           </div>
           <div class="relative">
             <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="text" id="login-username" value="" placeholder="Enter your username" required maxlength="13" autocomplete="off"
+            <input type="text" id="login-username" value="" placeholder="Enter username" required maxlength="13" autocomplete="off"
               oninput="handleUsernameValidation('login-username', 'login-username-error')"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
@@ -90,7 +109,7 @@
           <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
           <div class="relative">
             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="password" id="login-password" value="" placeholder="Enter your password" required autocomplete="new-password"
+            <input type="password" id="login-password" value="" placeholder="Enter password" required autocomplete="new-password"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
             <button type="button" onclick="togglePasswordVisibility('login-password', 'login-pass-icon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 focus:outline-none transition" title="Show/Hide password">
               <i data-lucide="eye" id="login-pass-icon" class="w-4 h-4"></i>
@@ -103,6 +122,7 @@
             <input type="checkbox" id="login-remember" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
             <span>Remember session</span>
           </label>
+          <span class="text-[10px] text-slate-400">RBAC Verified</span>
         </div>
 
         <button type="submit"
@@ -110,13 +130,30 @@
           <i data-lucide="log-in" class="w-4 h-4"></i>
           <span>Sign In to System</span>
         </button>
+
+        <!-- Quick Demo Accounts Helper -->
+        <div class="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700 text-[11px] space-y-1">
+          <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Demo Credentials:</div>
+          <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
+            <span>Admin: <strong class="font-mono text-emerald-600">mega3ac</strong> / <strong class="font-mono">@Mega123</strong></span>
+            <button type="button" onclick="fillCredentials('mega3ac', '@Mega123')" class="text-[10px] text-emerald-600 hover:underline">Use</button>
+          </div>
+          <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
+            <span>Manager: <strong class="font-mono text-blue-600">manager1</strong> / <strong class="font-mono">@Manager123</strong></span>
+            <button type="button" onclick="fillCredentials('manager1', '@Manager123')" class="text-[10px] text-blue-600 hover:underline">Use</button>
+          </div>
+          <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
+            <span>Cashier: <strong class="font-mono text-purple-600">cashier1</strong> / <strong class="font-mono">@Cashier123</strong></span>
+            <button type="button" onclick="fillCredentials('cashier1', '@Cashier123')" class="text-[10px] text-purple-600 hover:underline">Use</button>
+          </div>
+        </div>
       </form>
 
-      <!-- REGISTRATION FORM -->
+      <!-- REGISTRATION FORM (STORE ADMINISTRATOR) -->
       <form id="form-register" onsubmit="handleRegister(event)" autocomplete="off" class="hidden space-y-3.5">
         <div>
           <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Username (3 - 13 chars)</label>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Admin Username (3 - 13 chars)</label>
             <span class="text-[10px] text-slate-400">Max 13 chars</span>
           </div>
           <div class="relative">
@@ -129,10 +166,10 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password</label>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Master Password</label>
           <div class="relative">
             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-            <input type="password" id="reg-password" value="" placeholder="Create a strong password" required autocomplete="new-password"
+            <input type="password" id="reg-password" value="" placeholder="Create strong password" required autocomplete="new-password"
               oninput="handlePasswordInput(this.value)"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
             <button type="button" onclick="togglePasswordVisibility('reg-password', 'reg-pass-icon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 focus:outline-none transition" title="Show/Hide password">
@@ -167,7 +204,7 @@
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Owner Name</label>
-            <input type="text" id="reg-owner-name" value="" placeholder="e.g. Lokesh Maurya" autocomplete="off"
+            <input type="text" id="reg-owner-name" value="" placeholder="e.g. Store Owner" autocomplete="off"
               class="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-500 transition">
           </div>
         </div>
@@ -175,13 +212,13 @@
         <button type="submit"
           class="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-md shadow-emerald-600/20 active:scale-[0.99] mt-2">
           <i data-lucide="check-circle" class="w-4 h-4"></i>
-          <span>Create Account & Continue</span>
+          <span>Register Store Administrator</span>
         </button>
       </form>
 
       <!-- System Notice -->
       <div class="pt-3 border-t border-slate-100 dark:border-slate-800 text-center">
-        <p class="text-[11px] text-slate-400">Poka-Yoke Protected • SQLite Database</p>
+        <p class="text-[11px] text-slate-400">Strict RBAC Architecture • Poka-Yoke Protected</p>
       </div>
     </div>
   </div>
@@ -206,26 +243,35 @@
           <span class="h-4 w-px bg-slate-200 dark:bg-slate-700"></span>
 
           <!-- Dynamic Store Name Badge / Prompt Button -->
-          <div id="header-store-badge-container">
-            <!-- Injected via JavaScript -->
-          </div>
+          <div id="header-store-badge-container"></div>
 
           <!-- User Greeting Badge -->
           <div class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span id="user-greeting-text">Hello, User</span>
           </div>
+
+          <!-- Operational Role Badge -->
+          <div id="header-role-badge"></div>
         </div>
       </div>
 
       <!-- Right: Action Buttons & Logout -->
       <div class="flex items-center space-x-2.5">
-        <button onclick="openModal('addModal')" class="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-sm shadow-emerald-600/20">
+        <!-- Add Item Button (Hidden for Billing Cashier) -->
+        <button id="header-btn-add-item" onclick="openModal('addModal')" class="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-sm shadow-emerald-600/20">
           <i data-lucide="plus" class="w-4 h-4"></i>
           <span>Add Verified Item</span>
         </button>
+
+        <!-- GRN Inward Button (Visible to Admin & Manager) -->
+        <button id="header-btn-grn" onclick="openModal('grnModal')" class="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition shadow-sm shadow-blue-600/20" title="Goods Receipt Note (GRN) Inwarding">
+          <i data-lucide="truck" class="w-4 h-4"></i>
+          <span>Inward Stock (GRN)</span>
+        </button>
         
-        <button onclick="exportCSV()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium transition" title="Export CSV Report">
+        <!-- Export CSV (Visible to Admin & Manager) -->
+        <button id="header-btn-export" onclick="exportCSV()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium transition" title="Export CSV Report">
           <i data-lucide="download" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
           <span>Export CSV</span>
         </button>
@@ -245,21 +291,33 @@
     <!-- MAIN BODY (SIDEBAR + WORKSPACE) -->
     <div class="flex flex-1 overflow-hidden">
       
-      <!-- LEFT SIDEBAR -->
+      <!-- LEFT SIDEBAR (DYNAMICALLY FILTERED BY ROLE) -->
       <aside class="w-64 bg-slate-50/80 dark:bg-slate-900/60 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 p-3 transition-colors">
         <div class="space-y-1">
-          <div class="px-3 py-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Workspaces</div>
+          <div class="px-3 py-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase flex items-center justify-between">
+            <span>Workspaces</span>
+            <span id="sidebar-role-indicator" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400"></span>
+          </div>
           
           <!-- 1. Inventory Master -->
           <button onclick="switchView('inventory')" id="nav-inventory" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 transition group">
             <div class="flex items-center space-x-2.5">
               <i data-lucide="boxes" class="w-4 h-4 text-emerald-600"></i>
-              <span>Inventory Master</span>
+              <span id="nav-inventory-label">Inventory Master</span>
             </div>
             <span id="badge-sku-count" class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 font-mono font-bold">0</span>
           </button>
 
-          <!-- 2. Defect Tracker (Cleaned Label: strictly 'Defect Tracker') -->
+          <!-- 2. POS / Express Billing Counter -->
+          <button onclick="switchView('pos')" id="nav-pos" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition group">
+            <div class="flex items-center space-x-2.5">
+              <i data-lucide="receipt" class="w-4 h-4 text-indigo-500"></i>
+              <span>POS / Express Billing</span>
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 font-bold">Fast</span>
+          </button>
+
+          <!-- 3. Defect Tracker (Cleaned Label: strictly 'Defect Tracker') -->
           <button onclick="switchView('bugs')" id="nav-bugs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition group">
             <div class="flex items-center space-x-2.5">
               <i data-lucide="shield-alert" class="w-4 h-4 text-rose-500"></i>
@@ -268,7 +326,7 @@
             <span id="badge-open-bugs" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 font-mono font-bold">0</span>
           </button>
 
-          <!-- 3. Live Audit Console -->
+          <!-- 4. Live Audit Console -->
           <button onclick="switchView('logs')" id="nav-logs" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition group">
             <div class="flex items-center space-x-2.5">
               <i data-lucide="terminal" class="w-4 h-4 text-amber-500"></i>
@@ -276,27 +334,27 @@
             </div>
           </button>
 
-          <!-- 4. Settings Workspace -->
+          <!-- 5. Settings Workspace (Admin only) -->
           <button onclick="switchView('settings')" id="nav-settings" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition group">
             <div class="flex items-center space-x-2.5">
               <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
-              <span>Settings</span>
+              <span>Settings & Staff</span>
             </div>
           </button>
         </div>
 
-        <!-- Clean Status Footer -->
+        <!-- Role Scope Footer -->
         <div class="p-3 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs shadow-xs space-y-1.5">
           <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
             <div class="flex items-center space-x-2">
               <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span class="font-semibold text-slate-800 dark:text-white">System Active</span>
+              <span class="font-semibold text-slate-800 dark:text-white" id="sidebar-user-name">User</span>
             </div>
-            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">Online</span>
+            <span id="sidebar-role-pill" class="text-[10px] font-semibold px-1.5 py-0.5 rounded">Active</span>
           </div>
           <div class="flex items-center justify-between text-[11px] text-slate-400">
-            <span>Database:</span>
-            <span class="font-mono text-slate-600 dark:text-slate-400 font-medium">SQLite 3.x</span>
+            <span>Governance:</span>
+            <span class="font-mono text-slate-600 dark:text-slate-400 font-medium">RBAC Level-3</span>
           </div>
         </div>
       </aside>
@@ -322,7 +380,7 @@
         </div>
 
         <!-- KPI METRIC RIBBON (INTERACTIVE DEEP LINKS) -->
-        <section class="grid grid-cols-2 md:grid-cols-5 gap-3.5 shrink-0">
+        <section id="kpi-ribbon" class="grid grid-cols-2 md:grid-cols-5 gap-3.5 shrink-0">
           <!-- Card 1: Total SKUs -->
           <div onclick="kpiFilterReset()" title="Click to view all catalog items"
             class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-emerald-400 hover:shadow-md hover:scale-[1.01] cursor-pointer transition duration-150 active:scale-[0.99] group select-none">
@@ -351,16 +409,16 @@
             </div>
           </div>
 
-          <!-- Card 3: Asset Valuation -->
+          <!-- Card 3: Asset Valuation / Financial Metric -->
           <div onclick="kpiFilterReset()" title="Click to view valuation details"
             class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-purple-400 hover:shadow-md hover:scale-[1.01] cursor-pointer transition duration-150 active:scale-[0.99] group select-none">
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span class="group-hover:text-purple-600 transition">VALUATION</span>
+              <span class="group-hover:text-purple-600 transition" id="kpi-val-title">VALUATION</span>
               <i data-lucide="indian-rupee" class="w-4 h-4 text-purple-600 group-hover:scale-110 transition"></i>
             </div>
             <div class="text-2xl font-bold font-mono text-purple-700 dark:text-purple-400 my-1 truncate" id="kpi-val">₹ 0.00</div>
             <div class="text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Inventory Asset Worth</span>
+              <span id="kpi-val-sub">Inventory Asset Worth</span>
               <span class="text-purple-600 opacity-0 group-hover:opacity-100 transition text-[10px] font-semibold">View all →</span>
             </div>
           </div>
@@ -379,8 +437,8 @@
             </div>
           </div>
 
-          <!-- Card 5: Trapped Defects -->
-          <div onclick="switchView('bugs')" title="Click to navigate to Defect Tracker"
+          <!-- Card 5: Trapped Defects / Sales Volume -->
+          <div id="kpi-card-bugs" onclick="switchView('bugs')" title="Click to navigate to Defect Tracker"
             class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-rose-400 hover:shadow-md hover:scale-[1.01] cursor-pointer transition duration-150 active:scale-[0.99] group select-none">
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-between">
               <span class="group-hover:text-rose-600 transition">TRAPPED BUGS</span>
@@ -436,7 +494,7 @@
                     <th class="py-3 px-4 text-right">Total Value</th>
                     <th class="py-3 px-4 text-center">Reorder Limit</th>
                     <th class="py-3 px-4 text-center">Status</th>
-                    <th class="py-3 px-4 text-center">Quick Adjust & Actions</th>
+                    <th class="py-3 px-4 text-center" id="col-header-actions">Actions & Stock Adjust</th>
                   </tr>
                 </thead>
                 <tbody id="inventory-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
@@ -448,7 +506,146 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- VIEW 2: DEFECT TRACKER (CLEANED) -->
+        <!-- VIEW 2: POINT OF SALE (POS) / EXPRESS BILLING COUNTER -->
+        <!-- ================================================================= -->
+        <section id="view-pos" class="hidden flex-1 flex flex-col space-y-4">
+          
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 flex-1 min-h-[520px]">
+            
+            <!-- Left 2 Cols: Product Catalog & Fast SKU Search -->
+            <div class="lg:col-span-2 flex flex-col space-y-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+              
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 flex items-center justify-center font-bold">
+                    <i data-lucide="scan" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">POS Product Catalog</h3>
+                    <p class="text-xs text-slate-500">Scan barcode or search by SKU/Name</p>
+                  </div>
+                </div>
+
+                <div class="text-xs text-slate-500">
+                  Cashier: <strong id="pos-cashier-label" class="text-indigo-600 font-mono">-</strong>
+                </div>
+              </div>
+
+              <!-- POS Search -->
+              <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+                <input type="text" id="pos-item-search" oninput="filterPosCatalog()" placeholder="Type SKU or item name to add to cart..." 
+                  class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500">
+              </div>
+
+              <!-- Product Grid/List -->
+              <div class="flex-1 overflow-y-auto max-h-[420px] pr-1">
+                <div id="pos-catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <!-- Populated via JavaScript -->
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right 1 Col: Customer Billing & Cart -->
+            <div class="flex flex-col space-y-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs justify-between">
+              
+              <div class="space-y-3">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div class="flex items-center space-x-2">
+                    <i data-lucide="shopping-cart" class="w-4 h-4 text-emerald-600"></i>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Cart</h3>
+                  </div>
+                  <button onclick="clearPosCart()" class="text-[11px] text-rose-500 hover:underline">Clear All</button>
+                </div>
+
+                <!-- Customer Details -->
+                <div class="space-y-2">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Customer Name</label>
+                    <input type="text" id="pos-customer-name" value="Walk-in Customer" 
+                      class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
+                  </div>
+
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Payment Method</label>
+                    <select id="pos-payment-method" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
+                      <option value="Cash">💵 Cash</option>
+                      <option value="Card">💳 Credit / Debit Card</option>
+                      <option value="UPI">📱 UPI / QR Transfer</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Cart Line Items -->
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-2">
+                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Order Line Items:</div>
+                  <div id="pos-cart-items" class="space-y-2 max-h-[180px] overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-400 text-center py-6">Your cart is empty.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checkout Summary & Button -->
+              <div class="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2 text-xs">
+                <div class="flex items-center justify-between text-slate-500">
+                  <span>Subtotal:</span>
+                  <span id="pos-subtotal" class="font-mono text-slate-700 dark:text-slate-300">₹ 0.00</span>
+                </div>
+                <div class="flex items-center justify-between text-slate-500">
+                  <span>GST / Tax (5%):</span>
+                  <span id="pos-tax" class="font-mono text-slate-700 dark:text-slate-300">₹ 0.00</span>
+                </div>
+                <div class="flex items-center justify-between text-slate-500">
+                  <span>Discount (₹):</span>
+                  <input type="number" id="pos-discount" min="0" value="0" oninput="renderPosCart()" 
+                    class="w-20 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-right font-mono text-xs text-slate-800 dark:text-white">
+                </div>
+                <div class="flex items-center justify-between text-base font-bold text-slate-900 dark:text-white border-t border-slate-200 dark:border-slate-700 pt-2">
+                  <span>Grand Total:</span>
+                  <span id="pos-grand-total" class="font-mono text-emerald-600 dark:text-emerald-400">₹ 0.00</span>
+                </div>
+
+                <button onclick="processPosCheckout()" id="btn-pos-checkout"
+                  class="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-md shadow-emerald-600/20 active:scale-[0.99] mt-2">
+                  <i data-lucide="check-circle" class="w-4 h-4"></i>
+                  <span>Complete & Print Receipt</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Recent POS Orders List -->
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800 dark:text-white">🧾 Recent Sales Invoices</span>
+              <button onclick="loadPosHistory()" class="text-xs text-emerald-600 hover:underline">Refresh Sales</button>
+            </div>
+            <div class="overflow-x-auto max-h-[140px] overflow-y-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead class="text-slate-500 font-semibold border-b border-slate-200 dark:border-slate-700">
+                  <tr>
+                    <th class="py-2 px-3">Invoice #</th>
+                    <th class="py-2 px-3">Date</th>
+                    <th class="py-2 px-3">Customer</th>
+                    <th class="py-2 px-3">Method</th>
+                    <th class="py-2 px-3 text-right">Amount</th>
+                    <th class="py-2 px-3 text-center">Receipt</th>
+                  </tr>
+                </thead>
+                <tbody id="pos-history-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                  <!-- History injected here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VIEW 3: DEFECT TRACKER (CLEANED) -->
         <!-- ================================================================= -->
         <section id="view-bugs" class="hidden flex-1 flex flex-col space-y-3">
           
@@ -503,7 +700,7 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- VIEW 3: LIVE SYSTEM AUDIT CONSOLE -->
+        <!-- VIEW 4: LIVE SYSTEM AUDIT CONSOLE -->
         <!-- ================================================================= -->
         <section id="view-logs" class="hidden flex-1 flex flex-col space-y-3">
           
@@ -516,7 +713,7 @@
               <button onclick="loadLogs()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs transition">
                 🔄 Refresh Logs
               </button>
-              <button onclick="clearLogs()" class="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 text-xs transition">
+              <button id="btn-clear-logs" onclick="clearLogs()" class="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 text-xs transition">
                 🗑️ Clear Buffer
               </button>
             </div>
@@ -528,7 +725,7 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- VIEW 4: DEDICATED SETTINGS WORKSPACE -->
+        <!-- VIEW 5: DEDICATED SETTINGS WORKSPACE (ADMIN ONLY) -->
         <!-- ================================================================= -->
         <section id="view-settings" class="hidden flex-1 space-y-6">
           
@@ -555,7 +752,7 @@
 
                 <div>
                   <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Store Owner Name</label>
-                  <input type="text" id="settings-owner-name" placeholder="e.g. Lokesh Maurya" 
+                  <input type="text" id="settings-owner-name" placeholder="e.g. Store Owner" 
                     class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500">
                 </div>
 
@@ -584,7 +781,7 @@
                 </div>
                 <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
                   <span class="text-slate-500 dark:text-slate-400">Role & Access</span>
-                  <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800" id="profile-role">Administrator</span>
+                  <span class="px-2 py-0.5 rounded font-bold" id="profile-role">Store Administrator</span>
                 </div>
                 <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
                   <span class="text-slate-500 dark:text-slate-400">Account Created</span>
@@ -593,7 +790,71 @@
               </div>
             </div>
 
-            <!-- Section C: Appearance Settings -->
+            <!-- Section C: Staff Management (Store Administrator Only) -->
+            <div id="staff-management-panel" class="md:col-span-2 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                  <div class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Staff Management</h3>
+                    <p class="text-xs text-slate-500">Create staff credentials, assign roles & toggle active status</p>
+                  </div>
+                </div>
+
+                <span class="text-[11px] text-slate-400">Store Administrator Governance</span>
+              </div>
+
+              <!-- Create Staff Form -->
+              <form onsubmit="handleCreateStaff(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Staff Username (≤ 13 chars)</label>
+                  <input type="text" id="staff-username" placeholder="e.g. manager2" required maxlength="13" 
+                    class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Password</label>
+                  <input type="password" id="staff-password" placeholder="e.g. @Staff123" required 
+                    class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Assigned Operational Role</label>
+                  <select id="staff-role" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500">
+                    <option value="Inventory Manager">Inventory Manager (Supply & Stock)</option>
+                    <option value="Billing Cashier">Billing Cashier (POS & Sales)</option>
+                  </select>
+                </div>
+
+                <div class="flex items-end">
+                  <button type="submit" class="w-full py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm">
+                    + Create Staff Credential
+                  </button>
+                </div>
+              </form>
+
+              <!-- Staff Members Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead class="text-slate-500 font-semibold border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                      <th class="py-2 px-3">Username</th>
+                      <th class="py-2 px-3">Assigned Role</th>
+                      <th class="py-2 px-3 text-center">Account Status</th>
+                      <th class="py-2 px-3">Created</th>
+                      <th class="py-2 px-3 text-center">Access Control Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="staff-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                    <!-- Populated via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Section D: Appearance Settings -->
             <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
               <div class="flex items-center space-x-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-600">
@@ -624,27 +885,34 @@
               </div>
             </div>
 
-            <!-- Section D: Danger Zone (Account Deletion) -->
-            <div class="p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900 shadow-xs space-y-4">
+            <!-- Section E: Danger Zone (Admin Only) -->
+            <div id="settings-danger-zone" class="p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900 shadow-xs space-y-4">
               <div class="flex items-center space-x-2.5 pb-3 border-b border-rose-100 dark:border-rose-900/50">
                 <div class="p-2 rounded-lg bg-rose-100 dark:bg-rose-900 text-rose-600 dark:text-rose-300">
                   <i data-lucide="alert-octagon" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="text-sm font-bold text-rose-800 dark:text-rose-300">Danger Zone</h3>
-                  <p class="text-xs text-rose-600 dark:text-rose-400">Irreversible account actions</p>
+                  <h3 class="text-sm font-bold text-rose-800 dark:text-rose-300">Danger Zone (Admin Only)</h3>
+                  <p class="text-xs text-rose-600 dark:text-rose-400">Irreversible store and account actions</p>
                 </div>
               </div>
 
               <div class="space-y-3">
                 <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Permanently delete your user credentials and custom store settings. Requires your password confirmation.
+                  High-risk actions require password confirmation before execution.
                 </p>
 
-                <button type="button" onclick="openDeleteAccountModal()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs transition shadow-sm shadow-rose-600/30 flex items-center space-x-2">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                  <span>Delete My Account</span>
-                </button>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" onclick="openWipeDbModal()" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition shadow-sm flex items-center space-x-1.5">
+                    <i data-lucide="database" class="w-4 h-4"></i>
+                    <span>Wipe Store Catalog & Orders</span>
+                  </button>
+
+                  <button type="button" onclick="openDeleteAccountModal()" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs transition shadow-sm shadow-rose-600/30 flex items-center space-x-1.5">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <span>Delete Master Account</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -711,8 +979,8 @@
         <span id="detail-created" class="font-mono text-slate-600 dark:text-slate-300">-</span>
       </div>
 
-      <!-- Quick Steppers in Detail Drawer -->
-      <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
+      <!-- Quick Steppers in Detail Drawer (Hidden for Cashier) -->
+      <div id="detail-drawer-steppers" class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
         <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">Quick Adjust Stock:</span>
         <div class="flex items-center space-x-1.5">
           <button onclick="adjustDetailStock(-5)" class="px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-xs font-bold">-5</button>
@@ -724,7 +992,7 @@
 
       <!-- Modal Footer -->
       <div class="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
-        <div class="flex items-center space-x-2">
+        <div id="detail-drawer-actions" class="flex items-center space-x-2">
           <button onclick="editFromDetailDrawer()" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition flex items-center space-x-1.5">
             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
             <span>Edit Item</span>
@@ -847,7 +1115,172 @@
     </div>
   </div>
 
-  <!-- 4. DELETE ACCOUNT CONFIRMATION MODAL -->
+  <!-- 4. GOODS RECEIPT NOTE (GRN) INWARDING MODAL -->
+  <div id="grnModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-blue-200 dark:border-blue-900 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600">
+            <i data-lucide="truck" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Goods Receipt Note (GRN)</h3>
+            <p class="text-xs text-slate-500">Inward batch stock from supplier</p>
+          </div>
+        </div>
+        <button onclick="closeModal('grnModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleInwardGRN(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select Target SKU</label>
+          <select id="grn-sku" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-blue-500">
+            <!-- Populated from inventory -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Supplier / Vendor Name</label>
+          <input type="text" id="grn-supplier" placeholder="e.g. Apex Global Electronics Ltd" required 
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Received Qty (> 0)</label>
+            <input type="number" id="grn-qty" min="1" placeholder="20" required 
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Unit Cost ₹ (≥ 0)</label>
+            <input type="number" step="0.01" min="0" id="grn-cost" placeholder="450.00" required 
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-blue-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">GRN Number (Optional)</label>
+          <input type="text" id="grn-number" placeholder="Leave blank to auto-generate" 
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeModal('grnModal')" class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-sm">Confirm Inwarding</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. PRINTABLE INVOICE / RECEIPT MODAL -->
+  <div id="receiptModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-2xl">
+      
+      <!-- Printable Area -->
+      <div id="printable-receipt-area" class="p-4 bg-white text-slate-900 rounded-xl border border-slate-200 space-y-3 font-mono text-xs">
+        <div class="text-center pb-2 border-b border-dashed border-slate-300 space-y-0.5">
+          <div class="font-bold text-sm tracking-wider uppercase" id="receipt-store-title">STORE INVOICE</div>
+          <div class="text-[11px] text-slate-500" id="receipt-invoice-num">INV-000000</div>
+          <div class="text-[10px] text-slate-400" id="receipt-datetime">-</div>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] text-slate-600 pb-1 border-b border-slate-200">
+          <span>Customer: <strong id="receipt-customer">-</strong></span>
+          <span>Cashier: <strong id="receipt-cashier">-</strong></span>
+        </div>
+
+        <div class="py-1">
+          <table class="w-full text-left text-[11px]">
+            <thead>
+              <tr class="border-b border-slate-200 text-slate-500">
+                <th class="py-1">Item</th>
+                <th class="py-1 text-center">Qty</th>
+                <th class="py-1 text-right">Price</th>
+                <th class="py-1 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody id="receipt-items-body" class="divide-y divide-slate-100">
+              <!-- Line items -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pt-2 border-t border-dashed border-slate-300 space-y-1 text-[11px]">
+          <div class="flex items-center justify-between">
+            <span>Subtotal:</span>
+            <span id="receipt-subtotal">₹ 0.00</span>
+          </div>
+          <div class="flex items-center justify-between text-slate-500">
+            <span>Tax:</span>
+            <span id="receipt-tax">₹ 0.00</span>
+          </div>
+          <div class="flex items-center justify-between text-slate-500">
+            <span>Discount:</span>
+            <span id="receipt-discount">₹ 0.00</span>
+          </div>
+          <div class="flex items-center justify-between font-bold text-xs border-t border-slate-300 pt-1">
+            <span>TOTAL PAID:</span>
+            <span id="receipt-grandtotal">₹ 0.00</span>
+          </div>
+          <div class="text-[10px] text-slate-500 pt-1 text-center">
+            Payment Mode: <strong id="receipt-paymode">Cash</strong>
+          </div>
+        </div>
+
+        <div class="text-center pt-2 text-[10px] text-slate-400">
+          Thank you for your business!
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-between pt-1">
+        <button onclick="closeModal('receiptModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+          Close
+        </button>
+        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center space-x-1.5 shadow-sm">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print Receipt</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 6. WIPE DATABASE MODAL -->
+  <div id="wipeDbModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-900 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center space-x-3 text-amber-600 dark:text-amber-400">
+        <div class="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-950/60">
+          <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Wipe Store Catalog & Orders</h3>
+          <p class="text-xs text-slate-500">Irreversible catalog reset</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-600 dark:text-slate-400">
+        This will delete all inventory SKUs, sales invoices, and receipt history for your store. Enter your master password to proceed:
+      </p>
+
+      <form onsubmit="handleWipeDatabase(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Store Administrator Password</label>
+          <input type="password" id="wipe-password" placeholder="Enter password to confirm" required 
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-1">
+          <button type="button" onclick="closeModal('wipeDbModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-sm">Confirm Wipe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. DELETE ACCOUNT CONFIRMATION MODAL -->
   <div id="deleteAccountModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900 p-6 space-y-4 shadow-2xl">
       <div class="flex items-center space-x-3 text-rose-600 dark:text-rose-400">
@@ -888,6 +1321,7 @@
   <script>
     let inventoryData = [];
     let bugsData = [];
+    let posCart = [];
     let activeStockStatusFilter = 'ALL';
     let currentUser = null;
     let selectedDetailItem = null;
@@ -914,6 +1348,11 @@
       initTheme();
       checkAuthSession();
     });
+
+    function fillCredentials(u, p) {
+      document.getElementById('login-username').value = u;
+      document.getElementById('login-password').value = p;
+    }
 
     // =========================================================================
     // THEME SWITCHER (LIGHT vs DARK)
@@ -1071,7 +1510,7 @@
         ? 'flex-1 py-2 rounded-lg bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs transition'
         : 'flex-1 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
 
-      // Clear input fields strictly whenever switching between "Sign In" and "Create Account" tabs
+      // Clear input fields strictly whenever switching tabs
       document.getElementById('login-username').value = '';
       document.getElementById('login-password').value = '';
       document.getElementById('reg-username').value = '';
@@ -1116,7 +1555,6 @@
 
       clearAuthErrors();
 
-      // Username length validation (max 13 chars)
       if (username.length > 13) {
         const errEl = document.getElementById('login-username-error');
         if (errEl) {
@@ -1144,16 +1582,8 @@
             localStorage.removeItem('aeroflow_session');
           }
           renderAuthenticatedApp();
-          showToast(`Welcome back, ${currentUser.username}!`, 'success');
+          showToast(`Welcome back, ${currentUser.username}! (${currentUser.role})`, 'success');
         } else {
-          if (data.message && data.message.includes('Username must not exceed 13 characters')) {
-            const errEl = document.getElementById('login-username-error');
-            if (errEl) {
-              errEl.textContent = data.message;
-              errEl.classList.remove('hidden');
-            }
-            userEl.classList.add('border-rose-500');
-          }
           showToast(data.message || 'Invalid username or password', 'error');
         }
       } catch (err) {
@@ -1172,7 +1602,6 @@
 
       clearAuthErrors();
 
-      // Username length validation (max 13 chars)
       if (username.length > 13) {
         const errEl = document.getElementById('reg-username-error');
         if (errEl) {
@@ -1184,7 +1613,6 @@
         return;
       }
 
-      // Strict Password Complexity Enforcement
       const pwCheck = checkPasswordComplexity(password);
       if (!pwCheck.isValid) {
         const pwErr = document.getElementById('reg-password-error');
@@ -1215,21 +1643,6 @@
           renderAuthenticatedApp();
           showToast(data.message, 'success');
         } else {
-          if (data.message && data.message.includes('Username must not exceed 13 characters')) {
-            const errEl = document.getElementById('reg-username-error');
-            if (errEl) {
-              errEl.textContent = data.message;
-              errEl.classList.remove('hidden');
-            }
-            userEl.classList.add('border-rose-500');
-          } else if (data.message && data.message.includes('Password must include')) {
-            const pwErr = document.getElementById('reg-password-error');
-            if (pwErr) {
-              pwErr.textContent = data.message;
-              pwErr.classList.remove('hidden');
-            }
-            passEl.classList.add('border-rose-500');
-          }
           showToast(data.message || 'Registration failed', 'error');
         }
       } catch (err) {
@@ -1243,9 +1656,113 @@
       } catch (e) {}
 
       currentUser = null;
+      posCart = [];
       localStorage.removeItem('aeroflow_session');
       renderLoginScreen();
       showToast('Signed out successfully', 'info');
+    }
+
+    // =========================================================================
+    // ROLE-BASED ACCESS CONTROL (RBAC) UI ADAPTATION
+    // =========================================================================
+    function applyRBACPermissions() {
+      if (!currentUser) return;
+      const role = currentUser.role || 'Store Administrator';
+
+      // 1. Header Role Badge
+      const headerRoleBadge = document.getElementById('header-role-badge');
+      if (headerRoleBadge) {
+        if (role === 'Store Administrator') {
+          headerRoleBadge.innerHTML = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">👑 Store Administrator</span>`;
+        } else if (role === 'Inventory Manager') {
+          headerRoleBadge.innerHTML = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800">📦 Inventory Manager</span>`;
+        } else {
+          headerRoleBadge.innerHTML = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800">💳 Billing Cashier</span>`;
+        }
+      }
+
+      // 2. Sidebar Profile Pill
+      const pill = document.getElementById('sidebar-role-pill');
+      if (pill) {
+        pill.textContent = role;
+        pill.className = role === 'Store Administrator' 
+          ? 'text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
+          : (role === 'Inventory Manager' ? 'text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300' : 'text-[10px] font-semibold px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300');
+      }
+
+      document.getElementById('sidebar-user-name').textContent = currentUser.username;
+      document.getElementById('sidebar-role-indicator').textContent = role;
+
+      // 3. Dynamic Sidebar Navigation Visibility
+      const navInv = document.getElementById('nav-inventory');
+      const navPos = document.getElementById('nav-pos');
+      const navBugs = document.getElementById('nav-bugs');
+      const navLogs = document.getElementById('nav-logs');
+      const navSettings = document.getElementById('nav-settings');
+      const invLabel = document.getElementById('nav-inventory-label');
+
+      const btnAdd = document.getElementById('header-btn-add-item');
+      const btnGrn = document.getElementById('header-btn-grn');
+      const btnExport = document.getElementById('header-btn-export');
+      const staffPanel = document.getElementById('staff-management-panel');
+      const dangerZone = document.getElementById('settings-danger-zone');
+      const kpiBugsCard = document.getElementById('kpi-card-bugs');
+
+      if (role === 'Store Administrator') {
+        // Unrestricted Full Access
+        navInv.classList.remove('hidden');
+        navPos.classList.remove('hidden');
+        navBugs.classList.remove('hidden');
+        navLogs.classList.remove('hidden');
+        navSettings.classList.remove('hidden');
+        invLabel.textContent = "Inventory Master";
+
+        btnAdd.classList.remove('hidden');
+        btnGrn.classList.remove('hidden');
+        btnExport.classList.remove('hidden');
+        staffPanel.classList.remove('hidden');
+        dangerZone.classList.remove('hidden');
+        kpiBugsCard.classList.remove('hidden');
+
+      } else if (role === 'Inventory Manager') {
+        // Inventory & Supply Control
+        navInv.classList.remove('hidden');
+        navPos.classList.add('hidden');
+        navBugs.classList.remove('hidden');
+        navLogs.classList.remove('hidden');
+        navSettings.classList.add('hidden'); // Poka-Yoke: Hide settings & staff
+        invLabel.textContent = "Inventory Master";
+
+        btnAdd.classList.remove('hidden');
+        btnGrn.classList.remove('hidden');
+        btnExport.classList.remove('hidden');
+        staffPanel.classList.add('hidden');
+        dangerZone.classList.add('hidden');
+        kpiBugsCard.classList.remove('hidden');
+
+      } else if (role === 'Billing Cashier') {
+        // Front-Counter Sales (Fraud-Prevention Poka-Yoke)
+        navInv.classList.remove('hidden');
+        navPos.classList.remove('hidden');
+        navBugs.classList.add('hidden');
+        navLogs.classList.add('hidden');
+        navSettings.classList.add('hidden');
+        invLabel.textContent = "Catalog (Read-Only)";
+
+        btnAdd.classList.add('hidden');
+        btnGrn.classList.add('hidden');
+        btnExport.classList.add('hidden');
+        staffPanel.classList.add('hidden');
+        dangerZone.classList.add('hidden');
+        kpiBugsCard.classList.add('hidden');
+      }
+
+      // Default landing view based on role
+      if (role === 'Billing Cashier') {
+        switchView('pos');
+      } else {
+        switchView('inventory');
+      }
     }
 
     function renderAuthenticatedApp() {
@@ -1266,10 +1783,12 @@
         document.getElementById('settings-store-name').value = currentUser.store_name || '';
         document.getElementById('settings-owner-name').value = currentUser.store_owner_name || '';
         document.getElementById('profile-username').textContent = currentUser.username || '-';
-        document.getElementById('profile-role').textContent = currentUser.role || 'Administrator';
+        document.getElementById('profile-role').textContent = currentUser.role || 'Store Administrator';
         document.getElementById('profile-created').textContent = currentUser.created_at || 'Active Session';
+        document.getElementById('pos-cashier-label').textContent = currentUser.username;
       }
 
+      applyRBACPermissions();
       lucide.createIcons();
       refreshAll();
     }
@@ -1278,7 +1797,6 @@
       document.getElementById('app-shell').classList.add('hidden');
       document.getElementById('login-view').classList.remove('hidden');
       
-      // Ensure fields are strictly blank
       document.getElementById('login-username').value = '';
       document.getElementById('login-password').value = '';
       document.getElementById('reg-username').value = '';
@@ -1286,7 +1804,6 @@
       document.getElementById('reg-store-name').value = '';
       document.getElementById('reg-owner-name').value = '';
       
-      // Uncheck remember session by default
       const rem = document.getElementById('login-remember');
       if (rem) rem.checked = false;
 
@@ -1297,7 +1814,7 @@
     }
 
     // =========================================================================
-    // STORE NAME CONFIGURATION
+    // STORE CONFIGURATION & AUDIT
     // =========================================================================
     function updateStoreHeader() {
       const container = document.getElementById('header-store-badge-container');
@@ -1309,21 +1826,26 @@
 
       if (storeName) {
         container.innerHTML = `
-          <button onclick="switchView('settings')" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 transition" title="Click to edit Store Settings">
+          <button onclick="if(currentUser.role === 'Store Administrator') switchView('settings')" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 transition" title="Store: ${storeName}">
             <i data-lucide="store" class="w-3.5 h-3.5 text-emerald-600"></i>
             <span>${storeName}</span>
           </button>
         `;
         if (banner) banner.classList.add('hidden');
       } else {
-        container.innerHTML = `
-          <button onclick="switchView('settings')" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 border border-amber-200 dark:border-amber-800 text-xs font-semibold text-amber-800 dark:text-amber-300 transition" title="Configure your Store Name">
-            <i data-lucide="store" class="w-3.5 h-3.5 text-amber-600"></i>
-            <span>Set Your Store Name</span>
-            <i data-lucide="chevron-right" class="w-3 h-3 text-amber-600"></i>
-          </button>
-        `;
-        if (banner) banner.classList.remove('hidden');
+        if (currentUser && currentUser.role === 'Store Administrator') {
+          container.innerHTML = `
+            <button onclick="switchView('settings')" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 border border-amber-200 dark:border-amber-800 text-xs font-semibold text-amber-800 dark:text-amber-300 transition" title="Configure your Store Name">
+              <i data-lucide="store" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>Set Your Store Name</span>
+              <i data-lucide="chevron-right" class="w-3 h-3 text-amber-600"></i>
+            </button>
+          `;
+          if (banner) banner.classList.remove('hidden');
+        } else {
+          container.innerHTML = ``;
+          if (banner) banner.classList.add('hidden');
+        }
       }
       lucide.createIcons();
     }
@@ -1360,8 +1882,153 @@
     }
 
     // =========================================================================
-    // DANGER ZONE (ACCOUNT DELETION)
+    // STAFF MANAGEMENT (STORE ADMINISTRATOR ONLY)
     // =========================================================================
+    async function loadStaffList() {
+      if (!currentUser || currentUser.role !== 'Store Administrator') return;
+      try {
+        const res = await fetch('/api/staff');
+        const data = await res.json();
+        if (data.success) {
+          const tbody = document.getElementById('staff-table-body');
+          tbody.innerHTML = '';
+          if (data.staff.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400">No staff accounts registered yet. Use the form above to add staff.</td></tr>`;
+            return;
+          }
+          data.staff.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/60 transition';
+            const statusBadge = s.is_active 
+              ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Active</span>`
+              : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">Deactivated</span>`;
+
+            tr.innerHTML = `
+              <td class="py-2.5 px-3 font-mono font-bold text-slate-900 dark:text-white">${s.username}</td>
+              <td class="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-semibold">${s.role}</td>
+              <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-slate-400">${s.created_at || '-'}</td>
+              <td class="py-2.5 px-3 text-center">
+                <div class="flex items-center justify-center space-x-1.5">
+                  <button onclick="toggleStaffStatus(${s.id})" class="px-2 py-1 rounded ${s.is_active ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'} text-[10px] font-semibold border transition">
+                    ${s.is_active ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <button onclick="deleteStaffAccount(${s.id}, '${s.username}')" class="px-2 py-1 rounded bg-rose-50 text-rose-700 hover:bg-rose-100 text-[10px] font-semibold border border-rose-200 transition">
+                    Revoke
+                  </button>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (e) {
+        console.error('Failed to load staff list:', e);
+      }
+    }
+
+    async function handleCreateStaff(e) {
+      e.preventDefault();
+      const username = document.getElementById('staff-username').value.trim();
+      const password = document.getElementById('staff-password').value;
+      const role = document.getElementById('staff-role').value;
+
+      if (username.length > 13) {
+        showToast("Username must not exceed 13 characters.", "error");
+        return;
+      }
+
+      const pwCheck = checkPasswordComplexity(password);
+      if (!pwCheck.isValid) {
+        showToast("Password must include at least one uppercase letter, one number, and one special character.", "error");
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/staff/create', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({username, password, role})
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          document.getElementById('staff-username').value = '';
+          document.getElementById('staff-password').value = '';
+          loadStaffList();
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Error creating staff account', 'error');
+      }
+    }
+
+    async function toggleStaffStatus(staffId) {
+      try {
+        const res = await fetch('/api/staff/toggle-status', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({staff_id: staffId})
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          loadStaffList();
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (e) {
+        showToast('Failed to toggle status', 'error');
+      }
+    }
+
+    async function deleteStaffAccount(staffId, username) {
+      if (!confirm(`Are you sure you want to revoke and delete staff account '${username}'?`)) return;
+      try {
+        const res = await fetch(`/api/staff/${staffId}`, {method: 'DELETE'});
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          loadStaffList();
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (e) {
+        showToast('Failed to delete staff account', 'error');
+      }
+    }
+
+    // =========================================================================
+    // DANGER ZONE (DATABASE WIPE & ACCOUNT DELETION)
+    // =========================================================================
+    function openWipeDbModal() {
+      document.getElementById('wipe-password').value = '';
+      openModal('wipeDbModal');
+    }
+
+    async function handleWipeDatabase(e) {
+      e.preventDefault();
+      const password = document.getElementById('wipe-password').value.trim();
+      try {
+        const res = await fetch('/api/database/wipe', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({password})
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('wipeDbModal');
+          showToast(data.message, 'success');
+          refreshAll();
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (e) {
+        showToast('Failed to wipe database', 'error');
+      }
+    }
+
     function openDeleteAccountModal() {
       if (!currentUser) return;
       document.getElementById('delete-username-label').textContent = currentUser.username;
@@ -1424,7 +2091,6 @@
       showToast('Filtered: Critical Low Stock Items', 'warning');
     }
 
-    // Instantly calculate and update all top KPI summary cards from local state
     function updateKPICards() {
       const totalSkus = inventoryData.length;
       const totalUnits = inventoryData.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);
@@ -1460,7 +2126,9 @@
         loadInventory(),
         loadStats(),
         loadBugs(),
-        loadLogs()
+        loadLogs(),
+        loadPosHistory(),
+        loadStaffList()
       ]);
 
       if (icon) icon.classList.remove('animate-spin');
@@ -1482,9 +2150,13 @@
             ? 'text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 my-1' 
             : 'text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 my-1';
 
-          document.getElementById('kpi-bugs').textContent = data.bugs.total_bugs;
+          if (document.getElementById('kpi-bugs')) {
+            document.getElementById('kpi-bugs').textContent = data.bugs.total_bugs;
+          }
           document.getElementById('badge-sku-count').textContent = data.inventory.total_skus;
-          document.getElementById('badge-open-bugs').textContent = data.bugs.open_bugs;
+          if (document.getElementById('badge-open-bugs')) {
+            document.getElementById('badge-open-bugs').textContent = data.bugs.open_bugs;
+          }
         }
       } catch (err) {
         console.error('Failed to load stats:', err);
@@ -1503,11 +2175,29 @@
           inventoryData = data.items;
           updateKPICards();
           populateCategoryFilter();
+          populateGrnSkuDropdown();
           filterInventoryTable();
+          filterPosCatalog();
         }
       } catch (err) {
         console.error('Failed to load inventory:', err);
       }
+    }
+
+    function populateGrnSkuDropdown() {
+      const sel = document.getElementById('grn-sku');
+      if (!sel) return;
+      sel.innerHTML = '';
+      if (inventoryData.length === 0) {
+        sel.innerHTML = '<option value="">-- No SKUs available --</option>';
+        return;
+      }
+      inventoryData.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.sku;
+        opt.textContent = `${item.sku} - ${item.name} (Current: ${item.quantity})`;
+        sel.appendChild(opt);
+      });
     }
 
     function populateCategoryFilter() {
@@ -1544,7 +2234,8 @@
       const tbody = document.getElementById('inventory-table-body');
       tbody.innerHTML = '';
 
-      // Clean empty state for new accounts with no items
+      const isCashier = currentUser && currentUser.role === 'Billing Cashier';
+
       if (inventoryData.length === 0) {
         tbody.innerHTML = `
           <tr>
@@ -1555,10 +2246,11 @@
                 </div>
                 <h3 class="text-base font-bold text-slate-800 dark:text-white">Add items to your store</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xs">Your store catalog is currently empty. Get started by adding your first verified inventory SKU.</p>
+                ${!isCashier ? `
                 <button onclick="openModal('addModal')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-md shadow-emerald-600/20 active:scale-[0.99] mt-2">
                   <i data-lucide="plus" class="w-4 h-4"></i>
                   <span>+ Add Verified Item</span>
-                </button>
+                </button>` : ''}
               </div>
             </td>
           </tr>
@@ -1585,7 +2277,6 @@
 
       filtered.forEach(item => {
         const tr = document.createElement('tr');
-        // Entire row is clickable, opens comprehensive Detail Drawer / Modal
         tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/60 transition cursor-pointer group';
         tr.onclick = () => openItemDetailDrawer(item.sku);
 
@@ -1594,6 +2285,22 @@
           : (item.badge === 'warning'
             ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900">Low Stock</span>`
             : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">Healthy</span>`);
+
+        const actionCell = isCashier
+          ? `<div class="flex items-center justify-center">
+               <button onclick="event.stopPropagation(); addToPosCart('${item.sku}')" class="px-2 py-1 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 flex items-center space-x-1" title="Add to Sales Bill">
+                 <i data-lucide="plus" class="w-3 h-3"></i>
+                 <span>Add to Bill</span>
+               </button>
+             </div>`
+          : `<div class="flex items-center justify-center space-x-1.5">
+               <button onclick="event.stopPropagation(); adjustStock('${item.sku}', -1)" class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock Out -1">-1</button>
+               <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 1)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock In +1">+1</button>
+               <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 5)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock In +5">+5</button>
+               <span class="text-slate-300 dark:text-slate-700">|</span>
+               <button onclick="event.stopPropagation(); openEditModal('${item.sku}')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition" title="Edit Item Details"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+               <button onclick="event.stopPropagation(); deleteItem('${item.sku}')" class="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950 text-slate-400 hover:text-rose-600 transition" title="Delete Item"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+             </div>`;
 
         tr.innerHTML = `
           <td class="py-3 px-4 font-mono font-bold text-emerald-700 dark:text-emerald-400">${item.sku}</td>
@@ -1604,20 +2311,302 @@
           <td class="py-3 px-4 text-right font-mono text-slate-900 dark:text-white font-semibold">₹ ${item.total_value.toFixed(2)}</td>
           <td class="py-3 px-4 text-center font-mono text-slate-500 dark:text-slate-400">${item.reorder_level}</td>
           <td class="py-3 px-4 text-center">${statusBadge}</td>
-          <td class="py-3 px-4" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-center space-x-1.5">
-              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', -1)" class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock Out -1">-1</button>
-              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 1)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock In +1">+1</button>
-              <button onclick="event.stopPropagation(); adjustStock('${item.sku}', 5)" class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold transition active:scale-95" title="Stock In +5">+5</button>
-              <span class="text-slate-300 dark:text-slate-700">|</span>
-              <button onclick="event.stopPropagation(); openEditModal('${item.sku}')" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition" title="Edit Item Details"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
-              <button onclick="event.stopPropagation(); deleteItem('${item.sku}')" class="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950 text-slate-400 hover:text-rose-600 transition" title="Delete Item"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-            </div>
-          </td>
+          <td class="py-3 px-4" onclick="event.stopPropagation()">${actionCell}</td>
         `;
         tbody.appendChild(tr);
       });
       lucide.createIcons();
+    }
+
+    // =========================================================================
+    // POINT OF SALE (POS) BILLING COUNTER
+    // =========================================================================
+    function filterPosCatalog() {
+      const search = (document.getElementById('pos-item-search')?.value || '').toLowerCase();
+      const grid = document.getElementById('pos-catalog-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const filtered = inventoryData.filter(i => 
+        i.sku.toLowerCase().includes(search) || 
+        i.name.toLowerCase().includes(search) || 
+        i.category.toLowerCase().includes(search)
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-2 text-center py-10 text-xs text-slate-400">No catalog products match search.</div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border ${item.quantity > 0 ? 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-emerald-500 cursor-pointer' : 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 opacity-60 cursor-not-allowed'} transition flex flex-col justify-between`;
+        if (item.quantity > 0) {
+          card.onclick = () => addToPosCart(item.sku);
+        }
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-mono font-bold text-emerald-600">${item.sku}</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded ${item.quantity > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'} font-bold">
+                ${item.quantity > 0 ? `${item.quantity} in stock` : 'Out of Stock'}
+              </span>
+            </div>
+            <div class="font-semibold text-slate-800 dark:text-white text-xs truncate" title="${item.name}">${item.name}</div>
+            <div class="text-[11px] text-slate-400">${item.category}</div>
+          </div>
+          <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-700 text-xs font-bold">
+            <span class="text-slate-900 dark:text-white font-mono">₹ ${item.unit_price.toFixed(2)}</span>
+            <button type="button" class="px-2 py-1 rounded bg-emerald-600 text-white text-[10px] font-bold hover:bg-emerald-700 transition">
+              + Add
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function addToPosCart(sku) {
+      const item = inventoryData.find(i => i.sku === sku);
+      if (!item) return;
+      if (item.quantity <= 0) {
+        showToast(`Poka-Yoke: ${item.name} (${sku}) is completely out of stock.`, 'error');
+        return;
+      }
+
+      const existing = posCart.find(c => c.sku === sku);
+      if (existing) {
+        if (existing.quantity >= item.quantity) {
+          showToast(`Cannot add more than available stock (${item.quantity} units).`, 'warning');
+          return;
+        }
+        existing.quantity += 1;
+      } else {
+        posCart.push({
+          sku: item.sku,
+          name: item.name,
+          unit_price: item.unit_price,
+          quantity: 1,
+          max_stock: item.quantity
+        });
+      }
+      renderPosCart();
+    }
+
+    function updatePosCartQty(sku, delta) {
+      const entry = posCart.find(c => c.sku === sku);
+      if (!entry) return;
+
+      const nextQty = entry.quantity + delta;
+      if (nextQty <= 0) {
+        posCart = posCart.filter(c => c.sku !== sku);
+      } else if (nextQty > entry.max_stock) {
+        showToast(`Stock limit reached for ${entry.name}. Available: ${entry.max_stock}`, 'warning');
+        return;
+      } else {
+        entry.quantity = nextQty;
+      }
+      renderPosCart();
+    }
+
+    function clearPosCart() {
+      posCart = [];
+      renderPosCart();
+    }
+
+    function renderPosCart() {
+      const container = document.getElementById('pos-cart-items');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (posCart.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Your cart is empty.</p>`;
+        document.getElementById('pos-subtotal').textContent = '₹ 0.00';
+        document.getElementById('pos-tax').textContent = '₹ 0.00';
+        document.getElementById('pos-grand-total').textContent = '₹ 0.00';
+        return;
+      }
+
+      let subtotal = 0;
+      posCart.forEach(item => {
+        const lineTotal = item.quantity * item.unit_price;
+        subtotal += lineTotal;
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-xs';
+        row.innerHTML = `
+          <div class="flex-1 min-w-0 pr-2">
+            <div class="font-bold text-slate-800 dark:text-white truncate">${item.name}</div>
+            <div class="text-[10px] text-slate-400 font-mono">${item.sku} • ₹ ${item.unit_price.toFixed(2)}</div>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <button onclick="updatePosCartQty('${item.sku}', -1)" class="w-5 h-5 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-xs font-bold flex items-center justify-center">-</button>
+            <span class="font-mono font-bold px-1">${item.quantity}</span>
+            <button onclick="updatePosCartQty('${item.sku}', 1)" class="w-5 h-5 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-xs font-bold flex items-center justify-center">+</button>
+            <span class="font-mono font-bold text-emerald-600 pl-2">₹ ${lineTotal.toFixed(2)}</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      const tax = subtotal * 0.05;
+      const discountInput = document.getElementById('pos-discount');
+      const discount = Math.max(0, Number(discountInput?.value) || 0);
+      const grandTotal = Math.max(0, subtotal + tax - discount);
+
+      document.getElementById('pos-subtotal').textContent = `₹ ${subtotal.toFixed(2)}`;
+      document.getElementById('pos-tax').textContent = `₹ ${tax.toFixed(2)}`;
+      document.getElementById('pos-grand-total').textContent = `₹ ${grandTotal.toFixed(2)}`;
+    }
+
+    async function processPosCheckout() {
+      if (posCart.length === 0) {
+        showToast('Cart is empty. Add products before checkout.', 'error');
+        return;
+      }
+
+      const customer_name = document.getElementById('pos-customer-name').value.trim() || 'Walk-in Customer';
+      const payment_method = document.getElementById('pos-payment-method').value;
+      const discount = Math.max(0, Number(document.getElementById('pos-discount').value) || 0);
+
+      const payload = {
+        customer_name,
+        payment_method,
+        discount,
+        tax_rate: 0.05,
+        items: posCart.map(c => ({sku: c.sku, quantity: c.quantity}))
+      };
+
+      try {
+        const res = await fetch('/api/pos/checkout', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Transaction complete! Invoice #${data.invoice_number}`, 'success');
+          displayReceipt(data.sale);
+          clearPosCart();
+          await refreshAll();
+        } else {
+          showToast(`Checkout Rejected: ${data.message}`, 'error');
+        }
+      } catch (err) {
+        showToast('POS checkout connection failed', 'error');
+      }
+    }
+
+    function displayReceipt(sale) {
+      document.getElementById('receipt-store-title').textContent = (currentUser?.store_name || 'INVENTORY MANAGEMENT SYSTEM').toUpperCase();
+      document.getElementById('receipt-invoice-num').textContent = sale.invoice_number;
+      document.getElementById('receipt-datetime').textContent = sale.date || new Date().toLocaleString();
+      document.getElementById('receipt-customer').textContent = sale.customer_name;
+      document.getElementById('receipt-cashier').textContent = sale.cashier;
+      document.getElementById('receipt-paymode').textContent = sale.payment_method;
+
+      const tbody = document.getElementById('receipt-items-body');
+      tbody.innerHTML = '';
+      sale.items.forEach(it => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-1">${it.name}</td>
+          <td class="py-1 text-center">${it.quantity}</td>
+          <td class="py-1 text-right">₹ ${it.unit_price.toFixed(2)}</td>
+          <td class="py-1 text-right font-bold">₹ ${it.total.toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('receipt-subtotal').textContent = `₹ ${sale.subtotal.toFixed(2)}`;
+      document.getElementById('receipt-tax').textContent = `₹ ${sale.tax.toFixed(2)}`;
+      document.getElementById('receipt-discount').textContent = `₹ ${sale.discount.toFixed(2)}`;
+      document.getElementById('receipt-grandtotal').textContent = `₹ ${sale.total_amount.toFixed(2)}`;
+
+      openModal('receiptModal');
+    }
+
+    async function loadPosHistory() {
+      try {
+        const res = await fetch('/api/pos/history');
+        const data = await res.json();
+        if (data.success) {
+          const tbody = document.getElementById('pos-history-body');
+          if (!tbody) return;
+          tbody.innerHTML = '';
+          if (data.sales.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="py-3 text-center text-slate-400">No completed sales recorded yet.</td></tr>`;
+            return;
+          }
+          data.sales.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800 transition';
+            tr.innerHTML = `
+              <td class="py-2 px-3 font-mono font-bold text-indigo-600">${s.invoice_number}</td>
+              <td class="py-2 px-3 font-mono text-[10px] text-slate-400">${s.created_at}</td>
+              <td class="py-2 px-3 font-medium text-slate-800 dark:text-white">${s.customer_name}</td>
+              <td class="py-2 px-3 text-slate-500">${s.payment_method}</td>
+              <td class="py-2 px-3 text-right font-mono font-bold text-emerald-600">₹ ${s.total_amount.toFixed(2)}</td>
+              <td class="py-2 px-3 text-center">
+                <button onclick="viewReceipt('${s.invoice_number}')" class="text-[11px] text-indigo-600 hover:underline">View</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (e) {
+        console.error('Failed to load pos history:', e);
+      }
+    }
+
+    async function viewReceipt(invoiceNumber) {
+      try {
+        const res = await fetch(`/api/pos/receipt/${invoiceNumber}`);
+        const data = await res.json();
+        if (data.success) {
+          displayReceipt(data.receipt);
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (e) {
+        showToast('Failed to retrieve receipt', 'error');
+      }
+    }
+
+    // =========================================================================
+    // GOODS RECEIPT NOTE (GRN) INWARDING
+    // =========================================================================
+    async function handleInwardGRN(e) {
+      e.preventDefault();
+      const sku = document.getElementById('grn-sku').value;
+      const supplier_name = document.getElementById('grn-supplier').value.trim();
+      const received_qty = document.getElementById('grn-qty').value;
+      const unit_cost = document.getElementById('grn-cost').value;
+      const grn_number = document.getElementById('grn-number').value.trim();
+
+      try {
+        const res = await fetch('/api/inventory/grn', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({sku, supplier_name, received_qty, unit_cost, grn_number})
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          closeModal('grnModal');
+          document.getElementById('grn-supplier').value = '';
+          document.getElementById('grn-qty').value = '';
+          document.getElementById('grn-cost').value = '';
+          document.getElementById('grn-number').value = '';
+          await refreshAll();
+        } else {
+          showToast(`GRN Failed: ${data.message}`, 'error');
+        }
+      } catch (e) {
+        showToast('Failed to record GRN inwarding', 'error');
+      }
     }
 
     // =========================================================================
@@ -1646,13 +2635,17 @@
         healthEl.innerHTML = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Optimal: In Stock</span>`;
       }
 
+      // Hide stock steppers and edit/delete actions if role is Cashier
+      const isCashier = currentUser && currentUser.role === 'Billing Cashier';
+      document.getElementById('detail-drawer-steppers').classList.toggle('hidden', isCashier);
+      document.getElementById('detail-drawer-actions').classList.toggle('hidden', isCashier);
+
       openModal('itemDetailModal');
     }
 
     async function adjustDetailStock(delta) {
       if (!selectedDetailItem) return;
       await adjustStock(selectedDetailItem.sku, delta);
-      // Re-fetch item to update detail modal values
       setTimeout(() => {
         const updated = inventoryData.find(i => i.sku === selectedDetailItem.sku);
         if (updated) openItemDetailDrawer(updated.sku);
@@ -1672,7 +2665,6 @@
     }
 
     async function adjustStock(sku, delta) {
-      // Optimistic instant UI reactivity
       const targetItem = inventoryData.find(i => i.sku === sku);
       let previousQty = 0;
       if (targetItem) {
@@ -1709,7 +2701,6 @@
           showToast(`Stock updated for ${sku} (${delta > 0 ? '+' : ''}${delta})`, 'success');
           await Promise.all([loadInventory(), loadStats()]);
         } else {
-          // Revert optimistic update on failure
           if (targetItem) {
             targetItem.quantity = previousQty;
             targetItem.total_value = targetItem.quantity * targetItem.unit_price;
@@ -1728,7 +2719,6 @@
     async function deleteItem(sku) {
       if (!confirm(`Are you sure you want to delete item ${sku}?`)) return;
 
-      // Optimistic removal from local state
       const prevData = [...inventoryData];
       inventoryData = inventoryData.filter(i => i.sku !== sku);
       updateKPICards();
@@ -1857,6 +2847,7 @@
     // DEFECT TRACKER WORKSPACE
     // =========================================================================
     async function loadBugs() {
+      if (currentUser && currentUser.role === 'Billing Cashier') return;
       try {
         const res = await fetch('/api/bugs');
         const data = await res.json();
@@ -1873,6 +2864,7 @@
       const stFilter = document.getElementById('bug-status-filter').value;
       const sevFilter = document.getElementById('bug-sev-filter').value;
       const tbody = document.getElementById('bugs-table-body');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       const filtered = bugsData.filter(bug => {
@@ -1962,6 +2954,7 @@
     // SYSTEM AUDIT CONSOLE
     // =========================================================================
     async function loadLogs() {
+      if (currentUser && currentUser.role === 'Billing Cashier') return;
       try {
         const res = await fetch('/api/logs');
         const data = await res.json();
@@ -2004,7 +2997,7 @@
     // NAVIGATION SWITCHER
     // =========================================================================
     function switchView(viewName) {
-      ['inventory', 'bugs', 'logs', 'settings'].forEach(v => {
+      ['inventory', 'pos', 'bugs', 'logs', 'settings'].forEach(v => {
         const viewEl = document.getElementById(`view-${v}`);
         if (viewEl) viewEl.classList.add('hidden');
         const btn = document.getElementById(`nav-${v}`);
@@ -2018,6 +3011,11 @@
 
       if (viewName === 'logs') {
         loadLogs();
+      } else if (viewName === 'pos') {
+        filterPosCatalog();
+        loadPosHistory();
+      } else if (viewName === 'settings') {
+        loadStaffList();
       }
     }
 
@@ -2031,7 +3029,7 @@
       const toast = document.createElement('div');
       const colorClass = type === 'success' 
         ? 'bg-emerald-600 text-white shadow-emerald-600/30' 
-        : (type === 'error' ? 'bg-rose-600 text-white shadow-rose-600/30' : 'bg-slate-800 text-white shadow-slate-800/30');
+        : (type === 'error' ? 'bg-rose-600 text-white shadow-rose-600/30' : (type === 'warning' ? 'bg-amber-600 text-white shadow-amber-600/30' : 'bg-slate-800 text-white shadow-slate-800/30'));
 
       toast.className = `px-4 py-2.5 rounded-xl border border-white/10 shadow-lg text-xs flex items-center space-x-2 pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0 ${colorClass}`;
       toast.innerHTML = `<span>${message}</span>`;

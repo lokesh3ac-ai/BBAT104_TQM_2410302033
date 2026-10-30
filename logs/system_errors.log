@@ -49,3 +49,12 @@
 2026-10-30 10:07:03,393 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
 2026-10-30 10:09:57,547 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: index 'idx_items_user_sku'
 2026-10-30 10:09:57,597 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-30 10:23:25,520 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: index 'idx_items_user_sku'
+2026-10-30 10:23:25,604 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-30 10:24:36,432 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: index 'idx_items_user_sku'
+2026-10-30 10:24:36,508 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-30 10:27:05,688 [ERROR] Module:InventoryApp Line:19 - [Validation] Invalid SKU format. Must match pattern 'SKU-XXXX' (e.g., SKU-101, SKU-AB01).
+2026-10-30 10:28:15,626 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: index 'idx_items_user_sku'
+2026-10-30 10:28:15,681 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
+2026-10-30 10:35:16,552 [ERROR] Module:InventoryApp Line:19 - [InventoryLogic] UNIQUE constraint failed: index 'idx_items_user_sku'
+2026-10-30 10:35:16,623 [ERROR] Module:InventoryApp Line:19 - [StockControl] Insufficient stock. Available: 5, Requested deduction: 10
